@@ -9,10 +9,7 @@
 <title>CuidarJuntos</title>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
-<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/></noscript>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 /* ═══════════════════════════════════════════
    RESET + TOKENS
@@ -33,7 +30,7 @@
   --radius:14px;--radius-sm:10px;
   --nav-h:64px;
 }
-html,body{height:100%;background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:var(--text);}
+html,body{height:100%;background:#0D47A1;font-family:'Inter',system-ui,sans-serif;color:var(--text);}
 body{display:flex;justify-content:center;}
 
 /* ═══════════════════════════════════════════
@@ -4574,7 +4571,11 @@ function fecharSplash(){
   const sp=document.getElementById('splashScreen');
   if(!sp||sp.classList.contains('oculto'))return;
   sp.classList.add('fade-out');
-  setTimeout(()=>sp.classList.add('oculto'),620);
+  setTimeout(()=>{
+    sp.classList.add('oculto');
+    document.documentElement.style.background='';
+    document.body.style.background='';
+  },620);
 }
 document.addEventListener('DOMContentLoaded',function(){
   // Nome do paciente
