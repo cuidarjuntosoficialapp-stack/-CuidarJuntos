@@ -4632,76 +4632,8 @@ function abrirCotas(){
   carregarMinhaContrib();
 }
 
-// ═══════════════════════════════════════════
-// PWA — ÍCONE E MANIFEST DINÂMICO
-// ═══════════════════════════════════════════
-function setupPWA(){
-  const S = 512;
-  const cv = document.createElement('canvas');
-  cv.width = cv.height = S;
-  const g = cv.getContext('2d');
-
-  // Fundo azul degradê com cantos arredondados
-  const bg = g.createLinearGradient(0, 0, S, S);
-  bg.addColorStop(0,'#0D47A1'); bg.addColorStop(1,'#1976D2');
-  g.fillStyle = bg;
-  const r = 90;
-  g.beginPath();
-  g.moveTo(r,0); g.lineTo(S-r,0); g.quadraticCurveTo(S,0,S,r);
-  g.lineTo(S,S-r); g.quadraticCurveTo(S,S,S-r,S);
-  g.lineTo(r,S); g.quadraticCurveTo(0,S,0,S-r);
-  g.lineTo(0,r); g.quadraticCurveTo(0,0,r,0);
-  g.closePath(); g.fill();
-
-  // Coração branco no centro
-  g.fillStyle = 'rgba(255,255,255,0.15)';
-  const cx=S/2, cy=210, hs=180;
-  const desenharCoracao = (ctx, x, y, tam, cor) => {
-    ctx.fillStyle = cor;
-    ctx.beginPath();
-    ctx.moveTo(x, y + tam*0.45);
-    ctx.bezierCurveTo(x-tam*0.85, y+tam*0.05, x-tam, y-tam*0.38, x-tam*0.5, y-tam*0.38);
-    ctx.bezierCurveTo(x-tam*0.2, y-tam*0.38, x, y-tam*0.08, x, y-tam*0.08);
-    ctx.bezierCurveTo(x, y-tam*0.08, x+tam*0.2, y-tam*0.38, x+tam*0.5, y-tam*0.38);
-    ctx.bezierCurveTo(x+tam, y-tam*0.38, x+tam*0.85, y+tam*0.05, x, y+tam*0.45);
-    ctx.fill();
-  };
-  // Sombra suave
-  desenharCoracao(g, cx+6, cy+8, hs, 'rgba(0,0,0,0.15)');
-  // Coração principal branco
-  desenharCoracao(g, cx, cy, hs, '#ffffff');
-
-  // Cruz médica azul dentro do coração
-  g.fillStyle = '#1565C0';
-  const pw=30, ph=88;
-  g.fillRect(cx-pw/2, cy-ph/2-10, pw, ph);
-  g.fillRect(cx-ph/2, cy-pw/2-10, ph, pw);
-
-  // Texto "CuidarJuntos" embaixo
-  g.fillStyle = '#ffffff';
-  g.font = 'bold 46px Arial, sans-serif';
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.shadowColor = 'rgba(0,0,0,0.3)';
-  g.shadowBlur = 6;
-  g.fillText('CuidarJuntos', cx, S - 82);
-  g.shadowBlur = 0;
-
-  const icon512 = cv.toDataURL('image/png');
-
-  // Versão 192px
-  const cv2 = document.createElement('canvas');
-  cv2.width = cv2.height = 192;
-  cv2.getContext('2d').drawImage(cv, 0, 0, 192, 192);
-  const icon192 = cv2.toDataURL('image/png');
-
-  // Apple Touch Icon para iPhone (gerado dinamicamente)
-  const atl = document.createElement('link');
-  atl.rel = 'apple-touch-icon'; atl.href = icon512;
-  document.head.appendChild(atl);
-  // Manifest estático já está no <head> — não sobrescrever
-}
-document.addEventListener('DOMContentLoaded', setupPWA);
+// PWA usa ícones estáticos (icon-192.png, icon-512.png, favicon.svg)
+// setupPWA dinâmico removido — não é mais necessário
 
 // ═══════════════════════════════════════════
 // SPLASH SCREEN
