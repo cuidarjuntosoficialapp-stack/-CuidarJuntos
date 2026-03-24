@@ -595,17 +595,18 @@ select.inp{cursor:pointer;}
 <!-- ════════════════════════════════════════
      SPLASH SCREEN
 ════════════════════════════════════════ -->
-<div id="splashScreen">
+<div id="splashScreen" onclick="fecharSplash()">
   <canvas id="splashCanvas" width="120" height="120"></canvas>
   <div class="sp-app-nome">CuidarJuntos</div>
   <div class="sp-app-sub">Sistema de Cuidado Familiar</div>
   <div class="sp-pac-nome" id="spPacNome"></div>
-  <div class="sp-frase" id="spFrase">Cuidar com amor é o maior presente que você pode oferecer.</div>
-  <div class="sp-dots">
+  <div class="sp-frase">Cuidar com amor é o maior presente<br>que você pode oferecer.</div>
+  <div class="sp-dots" style="margin-top:24px;">
     <div class="sp-dot ativo" id="spD1"></div>
     <div class="sp-dot" id="spD2"></div>
     <div class="sp-dot" id="spD3"></div>
   </div>
+  <div style="margin-top:28px;font-size:12px;color:rgba(255,255,255,.45);">Toque para continuar</div>
 </div>
 
 <!-- ════════════════════════════════════════
@@ -4561,13 +4562,21 @@ document.addEventListener('DOMContentLoaded', setupPWA);
 // ═══════════════════════════════════════════
 // SPLASH SCREEN
 // ═══════════════════════════════════════════
-(function iniciarSplash(){
+let _splashTimer=null;
+function fecharSplash(){
+  if(_splashTimer){clearTimeout(_splashTimer);_splashTimer=null;}
+  const sp=document.getElementById('splashScreen');
+  if(!sp||sp.classList.contains('oculto'))return;
+  sp.classList.add('fade-out');
+  setTimeout(()=>sp.classList.add('oculto'),520);
+}
+window.addEventListener('load',function(){
   // Desenha ícone no canvas da splash
   const cv=document.getElementById('splashCanvas');
-  if(!cv)return;
+  if(!cv){fecharSplash();return;}
   const g=cv.getContext('2d');
   const S=120;
-  // Fundo degradê
+  // Fundo degradê com cantos arredondados
   const bg=g.createLinearGradient(0,0,S,S);
   bg.addColorStop(0,'#0D47A1');bg.addColorStop(1,'#1976D2');
   const r=22;
@@ -4583,26 +4592,22 @@ document.addEventListener('DOMContentLoaded', setupPWA);
   const cor=(ctx,x,y,t,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x,y+t*.45);ctx.bezierCurveTo(x-t*.85,y+t*.05,x-t,y-t*.38,x-t*.5,y-t*.38);ctx.bezierCurveTo(x-t*.2,y-t*.38,x,y-t*.08,x,y-t*.08);ctx.bezierCurveTo(x,y-t*.08,x+t*.2,y-t*.38,x+t*.5,y-t*.38);ctx.bezierCurveTo(x+t,y-t*.38,x+t*.85,y+t*.05,x,y+t*.45);ctx.fill();};
   cor(g,cx+2,cy+3,hs,'rgba(0,0,0,.15)');
   cor(g,cx,cy,hs,'#ffffff');
-  // Cruz
+  // Cruz médica
   g.fillStyle='#1565C0';
   g.fillRect(cx-6,cy-18,12,36);g.fillRect(cx-18,cy-6,36,12);
-  // Texto
+  // Texto dentro do ícone
   g.fillStyle='#fff';g.font='bold 11px Arial';g.textAlign='center';g.textBaseline='middle';
   g.fillText('CuidarJuntos',cx,S-13);
-
   // Nome do paciente
   const nomePac=localStorage.getItem('cj_pacNome')||'';
   if(nomePac) document.getElementById('spPacNome').textContent='Cuidando de '+nomePac;
-
-  // Animação dos dots e fechamento
+  // Dots animados
   const d1=document.getElementById('spD1'),d2=document.getElementById('spD2'),d3=document.getElementById('spD3');
-  setTimeout(()=>{d1.classList.remove('ativo');d2.classList.add('ativo');},10000);
-  setTimeout(()=>{d2.classList.remove('ativo');d3.classList.add('ativo');},20000);
-  setTimeout(()=>{
-    document.getElementById('splashScreen').classList.add('fade-out');
-    setTimeout(()=>{document.getElementById('splashScreen').classList.add('oculto');},520);
-  },30000);
-})();
+  setTimeout(()=>{d1.classList.remove('ativo');d2.classList.add('ativo');},3000);
+  setTimeout(()=>{d2.classList.remove('ativo');d3.classList.add('ativo');},6000);
+  // Fecha automaticamente em 10s (ou ao tocar)
+  _splashTimer=setTimeout(fecharSplash,10000);
+});
 
 // ═══════════════════════════════════════════
 // LOGOUT
