@@ -276,6 +276,13 @@ select.inp{cursor:pointer;}
 .msg-audio{display:flex;align-items:center;gap:10px;padding:4px 0;}
 .msg-audio audio{height:36px;max-width:220px;border-radius:20px;outline:none;}
 .msg-audio-label{font-size:11px;color:var(--t3);margin-top:3px;}
+.msg-img{max-width:220px;border-radius:10px;margin-top:4px;cursor:pointer;display:block;}
+.msg-arq{display:flex;align-items:center;gap:8px;padding:4px 0;text-decoration:none;color:inherit;}
+.msg-arq-ico{font-size:24px;flex-shrink:0;}
+.msg-arq-info{display:flex;flex-direction:column;}
+.msg-arq-name{font-size:12px;font-weight:600;word-break:break-all;}
+.msg-arq-size{font-size:10px;color:var(--t3);}
+.chat-anexo{width:40px;height:40px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;flex-shrink:0;transition:all .2s;}
 
 /* Modal */
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60;display:none;align-items:flex-end;}
@@ -2021,6 +2028,8 @@ select.inp{cursor:pointer;}
       <!-- mensagens carregadas pelo JS -->
     </div>
     <div class="chat-input-wrap">
+      <input type="file" id="chatFileInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" style="display:none" onchange="enviarAnexoChat(this)">
+      <button class="chat-anexo" onclick="document.getElementById('chatFileInput').click()" title="Enviar imagem ou arquivo">📎</button>
       <button class="chat-mic" id="chatMicBtn" onclick="toggleMic()" title="Gravar áudio">🎤</button>
       <textarea class="chat-inp" id="chatInput" placeholder="Digite uma mensagem..." rows="1"></textarea>
       <button class="chat-send" onclick="enviarMsg()">➤</button>
@@ -3276,6 +3285,37 @@ function _renderItem(m, wrap){
         <div class="msg-meta">${dataLabel}, ${m.hora}</div>`;
     }
     div.dataset.msgId = m.id||'';
+  } else if(m.tipo === 'imagem'){
+    const linkHref = m.linkDrive || '#';
+    const imgSrc   = m.linkDrive || m.urlLocal || '';
+    const status   = m.linkDrive ? '✅ Imagem salva' : '📴 Enviando...';
+    div.innerHTML = `
+      <div class="msg-bubble">
+        ${sender}
+        ${imgSrc ? `<a href="${linkHref}" target="_blank" rel="noopener"><img class="msg-img" src="${imgSrc}" alt="Imagem" loading="lazy"/></a>` : `<div style="font-size:12px;color:var(--t3);">🖼️ ${escHTML(m.nomeArq||'imagem')}</div>`}
+        <div style="font-size:10px;margin-top:3px;opacity:.7;">${status}</div>
+      </div>
+      <div class="msg-meta">${dataLabel}, ${m.hora}</div>`;
+    div.dataset.msgId = m.id||'';
+  } else if(m.tipo === 'arquivo'){
+    const linkHref = m.linkDrive || '#';
+    const ext = (m.nomeArq||'').split('.').pop().toLowerCase();
+    const ico = ext==='pdf'?'📄':ext==='doc'||ext==='docx'?'📝':ext==='xls'||ext==='xlsx'?'📊':'📎';
+    const status = m.linkDrive ? '✅ Arquivo salvo' : '📴 Enviando...';
+    div.innerHTML = `
+      <div class="msg-bubble">
+        ${sender}
+        <a class="msg-arq" href="${linkHref}" target="_blank" rel="noopener">
+          <span class="msg-arq-ico">${ico}</span>
+          <div class="msg-arq-info">
+            <span class="msg-arq-name">${escHTML(m.nomeArq||'arquivo')}</span>
+            <span class="msg-arq-size">${m.tamanho||''}</span>
+          </div>
+        </a>
+        <div style="font-size:10px;margin-top:3px;opacity:.7;">${status}</div>
+      </div>
+      <div class="msg-meta">${dataLabel}, ${m.hora}</div>`;
+    div.dataset.msgId = m.id||'';
   }
 
   wrap.appendChild(div);
@@ -4037,6 +4077,100 @@ async function processarAudio(){
     else toast('📴 Áudio salvo localmente — sem conexão');
   };
   reader.readAsDataURL(blob);
+}
+
+// ═══════════════════════════════════════════
+// CHAT — IMAGEM / ARQUIVO
+// ═══════════════════════════════════════════
+async function enviarAnexoChat(input){
+  if(!input.files||!input.files[0]) return;
+  const file = input.files[0];
+  input.value = ''; // limpar para permitir reenvio do mesmo arquivo
+
+  const ehImagem = file.type.startsWith('image/');
+  const tipo     = ehImagem ? 'imagem' : 'arquivo';
+  const agora    = new Date();
+  const h  = agora.getHours().toString().padStart(2,'0');
+  const mn = agora.getMinutes().toString().padStart(2,'0');
+  const data = agora.toLocaleDateString('pt-BR');
+  const msgId = Date.now().toString();
+  const kb = (file.size/1024).toFixed(0);
+  const nomeArq = file.name;
+
+  // 1. Salvar no localStorage imediatamente (sem Drive link ainda)
+  const obj = {id:msgId, tipo, proprio:true, nome:U?.nome||'', role:U?.role||'',
+               nomeArq, tamanho:`${kb} KB`, hora:h+':'+mn, data, linkDrive:'', urlLocal:''};
+  chatSalvar(obj);
+
+  // 2. Mostrar no chat com preview local
+  const urlLocal = URL.createObjectURL(file);
+  chatAtualizarUltimo({urlLocal});
+  const wrap = document.getElementById('chatMsgs');
+  if(wrap){
+    const div = document.createElement('div');
+    div.className = 'msg-out';
+    div.dataset.msgId = msgId;
+    if(ehImagem){
+      div.innerHTML = `<div class="msg-bubble"><img class="msg-img" src="${urlLocal}" alt="Imagem"/><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:3px;">Salvando no Drive...</div></div><div class="msg-meta">Hoje, ${h}:${mn}</div>`;
+    } else {
+      const ext = nomeArq.split('.').pop().toLowerCase();
+      const ico = ext==='pdf'?'📄':ext==='doc'||ext==='docx'?'📝':ext==='xls'||ext==='xlsx'?'📊':'📎';
+      div.innerHTML = `<div class="msg-bubble"><div class="msg-arq"><span class="msg-arq-ico">${ico}</span><div class="msg-arq-info"><span class="msg-arq-name">${escHTML(nomeArq)}</span><span class="msg-arq-size">${kb} KB</span></div></div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:3px;">Salvando no Drive...</div></div><div class="msg-meta">Hoje, ${h}:${mn}</div>`;
+    }
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  toast(`📎 ${ehImagem?'Imagem':'Arquivo'} recebido — enviando...`);
+
+  // 3. Converter para base64 e fazer upload ao Drive
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const base64 = reader.result.split(',')[1];
+    const r = await GAS.uploadDoc(nomeArq, base64, file.type, 'Anexos');
+    const linkDrive = r?.data?.linkArquivo || '';
+
+    // Atualizar localStorage com link permanente
+    chatAtualizarUltimo({linkDrive, urlLocal:''});
+
+    // Atualizar DOM
+    if(wrap){
+      const el = wrap.querySelector(`[data-msg-id="${msgId}"] .msg-bubble div:last-child`);
+      if(el){
+        if(linkDrive){
+          el.textContent = ehImagem ? '✅ Imagem salva' : '✅ Arquivo salvo';
+          // Se for imagem: tornar clicável para abrir no Drive
+          if(ehImagem){
+            const img = wrap.querySelector(`[data-msg-id="${msgId}"] img`);
+            if(img){
+              const a = document.createElement('a');
+              a.href = linkDrive; a.target='_blank'; a.rel='noopener';
+              img.parentNode.insertBefore(a, img);
+              a.appendChild(img);
+            }
+          } else {
+            const arqEl = wrap.querySelector(`[data-msg-id="${msgId}"] .msg-arq`);
+            if(arqEl){ arqEl.href = linkDrive; arqEl.target='_blank'; }
+          }
+        } else {
+          el.textContent = '📴 Salvo localmente — sem conexão';
+        }
+      }
+    }
+
+    // Salvar no GAS (Chat_Familiar)
+    const tipoLabel = ehImagem ? '[IMAGEM]' : '[ARQUIVO]';
+    GAS.salvarChat({
+      data, hora: h+':'+mn,
+      usuario: U?.nome||'',
+      perfil:  U?.role||'',
+      mensagem: `${tipoLabel} ${nomeArq}${linkDrive?' → '+linkDrive:''}`,
+    });
+
+    if(linkDrive) toast(`✅ ${ehImagem?'Imagem':'Arquivo'} salvo no Drive!`);
+    else toast('📴 Salvo localmente — sem conexão');
+  };
+  reader.readAsDataURL(file);
 }
 
 // ═══════════════════════════════════════════
