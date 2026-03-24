@@ -546,21 +546,31 @@ select.inp{cursor:pointer;}
    SPLASH SCREEN
 ═══════════════════════════════════════════ */
 #splashScreen{
-  position:fixed;inset:0;z-index:9999;
-  background:linear-gradient(160deg,#0D47A1 0%,#1565C0 50%,#1976D2 100%);
+  position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;
+  background:#0D47A1;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0;transition:opacity .5s ease;
+  transition:opacity .6s ease;cursor:pointer;
 }
 #splashScreen.fade-out{opacity:0;pointer-events:none;}
 #splashScreen.oculto{display:none;}
-#splashCanvas{width:120px;height:120px;border-radius:28px;box-shadow:0 8px 32px rgba(0,0,0,.3);}
-.sp-app-nome{font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-top:18px;}
-.sp-app-sub{font-size:12px;color:rgba(255,255,255,.65);font-weight:400;margin-top:4px;text-transform:uppercase;letter-spacing:.1em;}
-.sp-pac-nome{font-size:16px;font-weight:600;color:rgba(255,255,255,.9);margin-top:20px;}
-.sp-frase{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;font-style:italic;text-align:center;max-width:260px;line-height:1.5;}
-.sp-dots{display:flex;gap:6px;margin-top:32px;}
-.sp-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);}
-.sp-dot.ativo{background:#fff;width:18px;border-radius:3px;transition:width .3s;}
+.sp-icone{
+  width:110px;height:110px;border-radius:26px;
+  background:linear-gradient(145deg,#1565C0,#1E88E5);
+  box-shadow:0 8px 32px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;flex-shrink:0;
+}
+.sp-coracao{font-size:44px;line-height:1;margin-top:4px;}
+.sp-ico-txt{font-size:9px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.05em;text-transform:uppercase;}
+.sp-app-nome{font-size:30px;font-weight:800;color:#ffffff;letter-spacing:-.5px;margin-top:20px;}
+.sp-app-sub{font-size:11px;color:rgba(255,255,255,.6);font-weight:500;margin-top:3px;text-transform:uppercase;letter-spacing:.12em;}
+.sp-divider{width:40px;height:2px;background:rgba(255,255,255,.2);border-radius:2px;margin-top:20px;}
+.sp-pac-nome{font-size:15px;font-weight:600;color:rgba(255,255,255,.9);margin-top:14px;}
+.sp-frase{font-size:13px;color:rgba(255,255,255,.55);margin-top:8px;font-style:italic;text-align:center;max-width:260px;line-height:1.6;padding:0 24px;}
+.sp-toque{margin-top:36px;font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.06em;}
+.sp-dots{display:flex;gap:7px;margin-top:12px;}
+.sp-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25);}
+.sp-dot.ativo{background:#fff;width:20px;border-radius:4px;transition:width .4s;}
 
 /* ═══════════════════════════════════════════
    MODAL RECORTE DE FOTO
@@ -596,17 +606,21 @@ select.inp{cursor:pointer;}
      SPLASH SCREEN
 ════════════════════════════════════════ -->
 <div id="splashScreen" onclick="fecharSplash()">
-  <canvas id="splashCanvas" width="120" height="120"></canvas>
+  <div class="sp-icone">
+    <div class="sp-coracao">❤️</div>
+    <div class="sp-ico-txt">Cuidar</div>
+  </div>
   <div class="sp-app-nome">CuidarJuntos</div>
   <div class="sp-app-sub">Sistema de Cuidado Familiar</div>
+  <div class="sp-divider"></div>
   <div class="sp-pac-nome" id="spPacNome"></div>
-  <div class="sp-frase">Cuidar com amor é o maior presente<br>que você pode oferecer.</div>
-  <div class="sp-dots" style="margin-top:24px;">
+  <div class="sp-frase">"Cuidar com amor é o maior presente<br>que você pode oferecer."</div>
+  <div class="sp-toque">✦ Toque para continuar ✦</div>
+  <div class="sp-dots">
     <div class="sp-dot ativo" id="spD1"></div>
     <div class="sp-dot" id="spD2"></div>
     <div class="sp-dot" id="spD3"></div>
   </div>
-  <div style="margin-top:28px;font-size:12px;color:rgba(255,255,255,.45);">Toque para continuar</div>
 </div>
 
 <!-- ════════════════════════════════════════
@@ -4533,29 +4547,11 @@ function setupPWA(){
   cv2.getContext('2d').drawImage(cv, 0, 0, 192, 192);
   const icon192 = cv2.toDataURL('image/png');
 
-  // Apple Touch Icon (iPhone)
+  // Apple Touch Icon para iPhone (gerado dinamicamente)
   const atl = document.createElement('link');
   atl.rel = 'apple-touch-icon'; atl.href = icon512;
   document.head.appendChild(atl);
-
-  // Manifest para Android / instalação PWA
-  const mf = {
-    name: 'CuidarJuntos',
-    short_name: 'CuidarJuntos',
-    description: 'Sistema de cuidado familiar',
-    start_url: './app.html',
-    display: 'standalone',
-    background_color: '#0D47A1',
-    theme_color: '#1565C0',
-    icons: [
-      {src: icon192, sizes:'192x192', type:'image/png'},
-      {src: icon512, sizes:'512x512', type:'image/png', purpose:'any maskable'}
-    ]
-  };
-  const bl = new Blob([JSON.stringify(mf)], {type:'application/json'});
-  const ml = document.createElement('link');
-  ml.rel = 'manifest'; ml.href = URL.createObjectURL(bl);
-  document.head.appendChild(ml);
+  // Manifest estático já está no <head> — não sobrescrever
 }
 document.addEventListener('DOMContentLoaded', setupPWA);
 
@@ -4568,45 +4564,21 @@ function fecharSplash(){
   const sp=document.getElementById('splashScreen');
   if(!sp||sp.classList.contains('oculto'))return;
   sp.classList.add('fade-out');
-  setTimeout(()=>sp.classList.add('oculto'),520);
+  setTimeout(()=>sp.classList.add('oculto'),620);
 }
-window.addEventListener('load',function(){
-  // Desenha ícone no canvas da splash
-  const cv=document.getElementById('splashCanvas');
-  if(!cv){fecharSplash();return;}
-  const g=cv.getContext('2d');
-  const S=120;
-  // Fundo degradê com cantos arredondados
-  const bg=g.createLinearGradient(0,0,S,S);
-  bg.addColorStop(0,'#0D47A1');bg.addColorStop(1,'#1976D2');
-  const r=22;
-  g.fillStyle=bg;
-  g.beginPath();
-  g.moveTo(r,0);g.lineTo(S-r,0);g.quadraticCurveTo(S,0,S,r);
-  g.lineTo(S,S-r);g.quadraticCurveTo(S,S,S-r,S);
-  g.lineTo(r,S);g.quadraticCurveTo(0,S,0,S-r);
-  g.lineTo(0,r);g.quadraticCurveTo(0,0,r,0);
-  g.closePath();g.fill();
-  // Coração
-  const cx=S/2,cy=46,hs=38;
-  const cor=(ctx,x,y,t,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x,y+t*.45);ctx.bezierCurveTo(x-t*.85,y+t*.05,x-t,y-t*.38,x-t*.5,y-t*.38);ctx.bezierCurveTo(x-t*.2,y-t*.38,x,y-t*.08,x,y-t*.08);ctx.bezierCurveTo(x,y-t*.08,x+t*.2,y-t*.38,x+t*.5,y-t*.38);ctx.bezierCurveTo(x+t,y-t*.38,x+t*.85,y+t*.05,x,y+t*.45);ctx.fill();};
-  cor(g,cx+2,cy+3,hs,'rgba(0,0,0,.15)');
-  cor(g,cx,cy,hs,'#ffffff');
-  // Cruz médica
-  g.fillStyle='#1565C0';
-  g.fillRect(cx-6,cy-18,12,36);g.fillRect(cx-18,cy-6,36,12);
-  // Texto dentro do ícone
-  g.fillStyle='#fff';g.font='bold 11px Arial';g.textAlign='center';g.textBaseline='middle';
-  g.fillText('CuidarJuntos',cx,S-13);
+document.addEventListener('DOMContentLoaded',function(){
   // Nome do paciente
   const nomePac=localStorage.getItem('cj_pacNome')||'';
-  if(nomePac) document.getElementById('spPacNome').textContent='Cuidando de '+nomePac;
+  const el=document.getElementById('spPacNome');
+  if(el&&nomePac) el.textContent='Cuidando de '+nomePac;
   // Dots animados
   const d1=document.getElementById('spD1'),d2=document.getElementById('spD2'),d3=document.getElementById('spD3');
-  setTimeout(()=>{d1.classList.remove('ativo');d2.classList.add('ativo');},3000);
-  setTimeout(()=>{d2.classList.remove('ativo');d3.classList.add('ativo');},6000);
-  // Fecha automaticamente em 10s (ou ao tocar)
-  _splashTimer=setTimeout(fecharSplash,10000);
+  if(d1&&d2&&d3){
+    setTimeout(()=>{d1.classList.remove('ativo');d2.classList.add('ativo');},20000);
+    setTimeout(()=>{d2.classList.remove('ativo');d3.classList.add('ativo');},40000);
+  }
+  // Fecha automaticamente em 60s (ou ao tocar)
+  _splashTimer=setTimeout(fecharSplash,60000);
 });
 
 // ═══════════════════════════════════════════
