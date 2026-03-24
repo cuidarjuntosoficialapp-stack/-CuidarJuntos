@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<title>Gerar Ícones PNG — CuidarJuntos</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0A0F1E;font-family:system-ui,Arial,sans-serif;
+  display:flex;flex-direction:column;align-items:center;
+  padding:40px 20px;gap:32px;min-height:100vh;}
+h1{color:#fff;font-size:20px;font-weight:700;}
+p{color:rgba(255,255,255,.5);font-size:13px;text-align:center;max-width:400px;line-height:1.6;}
+.grid{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;}
+.card{background:#12192B;border:1px solid rgba(255,255,255,.1);border-radius:16px;
+  padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+canvas{border-radius:16px;}
+.btn{background:linear-gradient(135deg,#1565C0,#1E88E5);
+  color:#fff;border:none;border-radius:10px;padding:12px 24px;
+  font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:opacity .2s;}
+.btn:hover{opacity:.85;}
+.size-label{color:rgba(255,255,255,.5);font-size:11px;text-transform:uppercase;letter-spacing:.1em;}
+.tip{background:rgba(21,101,192,.15);border:1px solid rgba(21,101,192,.3);
+  border-radius:12px;padding:16px 20px;max-width:480px;
+  color:rgba(255,255,255,.7);font-size:12px;line-height:1.8;}
+.tip strong{color:#90CAF9;}
+</style>
+</head>
+<body>
+
+<h1>🎨 Gerador de Ícones PNG</h1>
+<p>Clique em "Baixar" para salvar cada ícone. Depois coloque os arquivos na pasta do projeto.</p>
+
+<div class="grid">
+  <div class="card">
+    <div class="size-label">192 × 192 px</div>
+    <canvas id="c192" width="192" height="192"></canvas>
+    <button class="btn" onclick="baixar('c192','icon-192.png')">⬇ Baixar icon-192.png</button>
+  </div>
+  <div class="card">
+    <div class="size-label">512 × 512 px</div>
+    <canvas id="c512" width="512" height="512" style="width:192px;height:192px;"></canvas>
+    <button class="btn" onclick="baixar('c512','icon-512.png')">⬇ Baixar icon-512.png</button>
+  </div>
+</div>
+
+<div class="tip">
+  <strong>Como usar:</strong><br/>
+  1. Baixe os dois arquivos acima<br/>
+  2. Copie para a pasta: <strong>C:\Users\PC\Projetos\CuidarJuntos\</strong><br/>
+  3. Substitua os arquivos existentes (icon-192.png e icon-512.png)<br/>
+  4. Faça commit e push pelo Claude Code
+</div>
+
+<script>
+function desenharIcone(canvas) {
+  const s = canvas.width;
+  const ctx = canvas.getContext('2d');
+  const r = s / 100; // escala
+
+  ctx.clearRect(0, 0, s, s);
+
+  // ── Fundo arredondado
+  const raio = s * 0.22;
+  ctx.beginPath();
+  ctx.moveTo(raio, 0);
+  ctx.lineTo(s - raio, 0);
+  ctx.quadraticCurveTo(s, 0, s, raio);
+  ctx.lineTo(s, s - raio);
+  ctx.quadraticCurveTo(s, s, s - raio, s);
+  ctx.lineTo(raio, s);
+  ctx.quadraticCurveTo(0, s, 0, s - raio);
+  ctx.lineTo(0, raio);
+  ctx.quadraticCurveTo(0, 0, raio, 0);
+  ctx.closePath();
+  const bgGrad = ctx.createLinearGradient(0, 0, s, s);
+  bgGrad.addColorStop(0, '#1565C0');
+  bgGrad.addColorStop(1, '#0D3B8E');
+  ctx.fillStyle = bgGrad;
+  ctx.fill();
+
+  // ── Coração (path escalado)
+  function coracaoPath(ctx, r) {
+    ctx.beginPath();
+    ctx.moveTo(50*r, 83*r);
+    ctx.bezierCurveTo(27*r, 67*r, 9*r, 52*r, 9*r, 34*r);
+    ctx.bezierCurveTo(9*r, 20*r, 20*r, 11*r, 33*r, 11*r);
+    ctx.bezierCurveTo(40*r, 11*r, 46*r, 14*r, 50*r, 19*r);
+    ctx.bezierCurveTo(54*r, 14*r, 60*r, 11*r, 67*r, 11*r);
+    ctx.bezierCurveTo(80*r, 11*r, 91*r, 20*r, 91*r, 34*r);
+    ctx.bezierCurveTo(91*r, 52*r, 73*r, 67*r, 50*r, 83*r);
+    ctx.closePath();
+  }
+
+  // Gradiente do coração
+  const hGrad = ctx.createLinearGradient(9*r, 11*r, 91*r, 83*r);
+  hGrad.addColorStop(0, '#1E88E5');
+  hGrad.addColorStop(0.45, '#1565C0');
+  hGrad.addColorStop(1, '#0D3B8E');
+
+  coracaoPath(ctx, r);
+  ctx.fillStyle = hGrad;
+  ctx.shadowColor = 'rgba(0,0,0,0.3)';
+  ctx.shadowBlur = 8 * r;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Recorte para o interior
+  ctx.save();
+  coracaoPath(ctx, r);
+  ctx.clip();
+
+  // Brilho no topo
+  ctx.beginPath();
+  ctx.moveTo(33*r, 13*r);
+  ctx.bezierCurveTo(40*r, 13*r, 46*r, 16*r, 50*r, 21*r);
+  ctx.bezierCurveTo(54*r, 16*r, 60*r, 13*r, 67*r, 13*r);
+  ctx.bezierCurveTo(76*r, 13*r, 84*r, 18*r, 88*r, 26*r);
+  ctx.bezierCurveTo(80*r, 17*r, 66*r, 11*r, 50*r, 11*r);
+  ctx.bezierCurveTo(34*r, 11*r, 20*r, 17*r, 12*r, 26*r);
+  ctx.bezierCurveTo(16*r, 18*r, 24*r, 13*r, 33*r, 13*r);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.fill();
+
+  // Barras (6 barras ascendentes)
+  const bars = [
+    {x:16, y:61, w:7.5, h:20, op:0.40},
+    {x:26, y:52, w:7.5, h:29, op:0.55},
+    {x:36, y:44, w:7.5, h:37, op:0.70},
+    {x:46, y:35, w:7.5, h:46, op:0.85},
+    {x:56, y:26, w:7.5, h:55, op:0.93},
+    {x:66, y:17, w:8,   h:64, op:0.97},
+  ];
+  bars.forEach(b => {
+    const bGrad = ctx.createLinearGradient(0, b.y*r, 0, (b.y+b.h)*r);
+    bGrad.addColorStop(0, `rgba(255,255,255,${b.op})`);
+    bGrad.addColorStop(1, `rgba(255,255,255,${b.op*0.22})`);
+    ctx.fillStyle = bGrad;
+    ctx.globalAlpha = 1;
+    const rx = 2*r;
+    const bx=b.x*r, by=b.y*r, bw=b.w*r, bh=b.h*r;
+    ctx.beginPath();
+    ctx.moveTo(bx+rx, by);
+    ctx.lineTo(bx+bw-rx, by);
+    ctx.quadraticCurveTo(bx+bw, by, bx+bw, by+rx);
+    ctx.lineTo(bx+bw, by+bh-rx);
+    ctx.quadraticCurveTo(bx+bw, by+bh, bx+bw-rx, by+bh);
+    ctx.lineTo(bx+rx, by+bh);
+    ctx.quadraticCurveTo(bx, by+bh, bx, by+bh-rx);
+    ctx.lineTo(bx, by+rx);
+    ctx.quadraticCurveTo(bx, by, bx+rx, by);
+    ctx.closePath();
+    ctx.fill();
+  });
+
+  // Linha ECG vermelha
+  const pts = [[11,62],[18,62],[24,42],[30,72],[37,51],[43,51],[49,62],[55,62],[61,30],[67,62],[73,18],[82,18]];
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0]*r, pts[0][1]*r);
+  pts.slice(1).forEach(p => ctx.lineTo(p[0]*r, p[1]*r));
+  ctx.strokeStyle = '#EF5350';
+  ctx.lineWidth = 2.8*r;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.shadowColor = 'rgba(239,83,80,0.5)';
+  ctx.shadowBlur = 5*r;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Ponto do pico
+  ctx.beginPath();
+  ctx.arc(73*r, 18*r, 6*r, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(239,83,80,0.25)';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(73*r, 18*r, 3.8*r, 0, Math.PI*2);
+  ctx.fillStyle = '#EF5350';
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function baixar(id, nome) {
+  const canvas = document.getElementById(id);
+  const link = document.createElement('a');
+  link.download = nome;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// Desenha ao carregar
+window.addEventListener('load', () => {
+  desenharIcone(document.getElementById('c192'));
+  desenharIcone(document.getElementById('c512'));
+});
+</script>
+</body>
+</html>

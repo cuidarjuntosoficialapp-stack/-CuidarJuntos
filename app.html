@@ -9,6 +9,7 @@
 <title>CuidarJuntos</title>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 /* ═══════════════════════════════════════════
@@ -89,7 +90,12 @@ body{display:flex;justify-content:center;}
   position:sticky;top:0;z-index:20;
 }
 .tb-menu{width:36px;height:36px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:#fff;flex-shrink:0;}
+.tb-logo{width:28px;height:28px;flex-shrink:0;}
+.tb-logo svg{width:28px;height:28px;}
 .tb-info{flex:1;}
+/* ── LOGIN LOGO ── */
+.login-logo{margin-bottom:12px;}
+.login-logo svg{width:64px;height:64px;filter:drop-shadow(0 4px 16px rgba(0,0,0,.3));}
 .tb-title{font-size:15px;font-weight:700;color:#fff;}
 .tb-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;}
 .tb-actions{display:flex;align-items:center;gap:8px;}
@@ -606,10 +612,44 @@ select.inp{cursor:pointer;}
      SPLASH SCREEN
 ════════════════════════════════════════ -->
 <div id="splashScreen" onclick="fecharSplash()" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;background:#0D47A1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .6s ease;font-family:system-ui,Arial,sans-serif;">
-  <!-- Ícone -->
-  <div style="width:110px;height:110px;border-radius:26px;background:#1565C0;box-shadow:0 8px 32px rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex-shrink:0;">
-    <div style="font-size:46px;line-height:1;">🫶</div>
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.08em;text-transform:uppercase;">Cuidar</div>
+  <!-- Ícone SVG profissional -->
+  <div style="width:110px;height:110px;flex-shrink:0;filter:drop-shadow(0 6px 24px rgba(0,0,0,.35));">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;">
+      <defs>
+        <linearGradient id="spHG" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1E88E5"/>
+          <stop offset="45%" stop-color="#1565C0"/>
+          <stop offset="100%" stop-color="#0D3B8E"/>
+        </linearGradient>
+        <linearGradient id="spBG" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="rgba(255,255,255,.95)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,.2)"/>
+        </linearGradient>
+        <clipPath id="spHC">
+          <path d="M50,83 C27,67 9,52 9,34 C9,20 20,11 33,11 C40,11 46,14 50,19 C54,14 60,11 67,11 C80,11 91,20 91,34 C91,52 73,67 50,83 Z"/>
+        </clipPath>
+        <filter id="spGlow">
+          <feGaussianBlur stdDeviation="1.8" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path d="M50,83 C27,67 9,52 9,34 C9,20 20,11 33,11 C40,11 46,14 50,19 C54,14 60,11 67,11 C80,11 91,20 91,34 C91,52 73,67 50,83 Z" fill="url(#spHG)"/>
+      <path d="M33,13 C40,13 46,16 50,21 C54,16 60,13 67,13 C76,13 84,18 88,26 C80,17 66,11 50,11 C34,11 20,17 12,26 C16,18 24,13 33,13 Z" fill="rgba(255,255,255,.18)" clip-path="url(#spHC)"/>
+      <path d="M50,80 C29,65 11,51 11,34 C11,21 21,13 33,13 C40,13 46,16 50,21 C54,16 60,13 67,13 C79,13 89,21 89,34 C89,51 71,65 50,80 Z" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="1"/>
+      <g clip-path="url(#spHC)">
+        <rect x="16" y="61" width="7.5" height="20" rx="2" fill="url(#spBG)" opacity=".40"/>
+        <rect x="26" y="52" width="7.5" height="29" rx="2" fill="url(#spBG)" opacity=".55"/>
+        <rect x="36" y="44" width="7.5" height="37" rx="2" fill="url(#spBG)" opacity=".70"/>
+        <rect x="46" y="35" width="7.5" height="46" rx="2" fill="url(#spBG)" opacity=".85"/>
+        <rect x="56" y="26" width="7.5" height="55" rx="2" fill="url(#spBG)" opacity=".93"/>
+        <rect x="66" y="17" width="8" height="64" rx="2" fill="rgba(255,255,255,.97)"/>
+        <polyline points="11,62 18,62 24,42 30,72 37,51 43,51 49,62 55,62 61,30 67,62 73,18 82,18"
+          fill="none" stroke="#EF5350" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"
+          filter="url(#spGlow)" opacity=".93"/>
+        <circle cx="73" cy="18" r="5.5" fill="rgba(239,83,80,.22)"/>
+        <circle cx="73" cy="18" r="3.5" fill="#EF5350"/>
+      </g>
+    </svg>
   </div>
   <!-- Nome do app -->
   <div style="font-size:30px;font-weight:800;color:#ffffff;letter-spacing:-.5px;margin-top:20px;">CuidarJuntos</div>
@@ -659,6 +699,38 @@ select.inp{cursor:pointer;}
 
   <!-- CABEÇALHO AZUL -->
   <div class="login-hero">
+    <!-- LOGO SVG -->
+    <div class="login-logo">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lhHG" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#42A5F5"/>
+            <stop offset="50%" stop-color="#1E88E5"/>
+            <stop offset="100%" stop-color="#1565C0"/>
+          </linearGradient>
+          <linearGradient id="lhBG" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(255,255,255,.95)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,.2)"/>
+          </linearGradient>
+          <clipPath id="lhHC">
+            <path d="M50,83 C27,67 9,52 9,34 C9,20 20,11 33,11 C40,11 46,14 50,19 C54,14 60,11 67,11 C80,11 91,20 91,34 C91,52 73,67 50,83 Z"/>
+          </clipPath>
+        </defs>
+        <path d="M50,83 C27,67 9,52 9,34 C9,20 20,11 33,11 C40,11 46,14 50,19 C54,14 60,11 67,11 C80,11 91,20 91,34 C91,52 73,67 50,83 Z" fill="url(#lhHG)"/>
+        <path d="M33,13 C40,13 46,16 50,21 C54,16 60,13 67,13 C76,13 84,18 88,26 C80,17 66,11 50,11 C34,11 20,17 12,26 C16,18 24,13 33,13 Z" fill="rgba(255,255,255,.2)" clip-path="url(#lhHC)"/>
+        <g clip-path="url(#lhHC)">
+          <rect x="16" y="61" width="7.5" height="20" rx="2" fill="url(#lhBG)" opacity=".40"/>
+          <rect x="26" y="52" width="7.5" height="29" rx="2" fill="url(#lhBG)" opacity=".55"/>
+          <rect x="36" y="44" width="7.5" height="37" rx="2" fill="url(#lhBG)" opacity=".70"/>
+          <rect x="46" y="35" width="7.5" height="46" rx="2" fill="url(#lhBG)" opacity=".85"/>
+          <rect x="56" y="26" width="7.5" height="55" rx="2" fill="url(#lhBG)" opacity=".93"/>
+          <rect x="66" y="17" width="8" height="64" rx="2" fill="rgba(255,255,255,.97)"/>
+          <polyline points="11,62 18,62 24,42 30,72 37,51 43,51 49,62 55,62 61,30 67,62 73,18 82,18"
+            fill="none" stroke="#EF9A9A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="73" cy="18" r="3.5" fill="#EF9A9A"/>
+        </g>
+      </svg>
+    </div>
     <div class="app-title">CuidarJuntos</div>
     <div class="app-sub">Sistema de Cuidado Familiar</div>
 
@@ -830,6 +902,29 @@ select.inp{cursor:pointer;}
 <!-- TOPBAR -->
 <div class="topbar" id="topbar">
   <div class="tb-menu" onclick="abrirDrawer()">☰</div>
+  <div class="tb-logo">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="tbHG" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="rgba(255,255,255,.9)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,.6)"/>
+        </linearGradient>
+        <clipPath id="tbHC">
+          <path d="M50,83 C27,67 9,52 9,34 C9,20 20,11 33,11 C40,11 46,14 50,19 C54,14 60,11 67,11 C80,11 91,20 91,34 C91,52 73,67 50,83 Z"/>
+        </clipPath>
+      </defs>
+      <path d="M50,83 C27,67 9,52 9,34 C9,20 20,11 33,11 C40,11 46,14 50,19 C54,14 60,11 67,11 C80,11 91,20 91,34 C91,52 73,67 50,83 Z" fill="rgba(255,255,255,.18)"/>
+      <g clip-path="url(#tbHC)">
+        <rect x="20" y="58" width="8" height="22" rx="2" fill="rgba(255,255,255,.45)"/>
+        <rect x="31" y="48" width="8" height="32" rx="2" fill="rgba(255,255,255,.60)"/>
+        <rect x="42" y="38" width="8" height="42" rx="2" fill="rgba(255,255,255,.75)"/>
+        <rect x="53" y="28" width="8" height="52" rx="2" fill="rgba(255,255,255,.88)"/>
+        <rect x="64" y="18" width="9" height="62" rx="2" fill="rgba(255,255,255,.97)"/>
+        <polyline points="14,62 22,55 28,38 35,68 42,48 50,48 56,60 62,32 70,18 80,18"
+          fill="none" stroke="#EF9A9A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </svg>
+  </div>
   <div class="tb-info">
     <div class="tb-title" id="tbTitle">Início</div>
     <div class="tb-sub" id="tbSub">José do Carmo · Carmito</div>
