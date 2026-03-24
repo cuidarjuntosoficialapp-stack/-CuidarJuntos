@@ -605,21 +605,28 @@ select.inp{cursor:pointer;}
 <!-- ════════════════════════════════════════
      SPLASH SCREEN
 ════════════════════════════════════════ -->
-<div id="splashScreen" onclick="fecharSplash()">
-  <div class="sp-icone">
-    <div class="sp-coracao">❤️</div>
-    <div class="sp-ico-txt">Cuidar</div>
+<div id="splashScreen" onclick="fecharSplash()" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;background:#0D47A1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity .6s ease;font-family:system-ui,Arial,sans-serif;">
+  <!-- Ícone -->
+  <div style="width:110px;height:110px;border-radius:26px;background:#1565C0;box-shadow:0 8px 32px rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex-shrink:0;">
+    <div style="font-size:46px;line-height:1;">❤️</div>
+    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.08em;text-transform:uppercase;">Cuidar</div>
   </div>
-  <div class="sp-app-nome">CuidarJuntos</div>
-  <div class="sp-app-sub">Sistema de Cuidado Familiar</div>
-  <div class="sp-divider"></div>
-  <div class="sp-pac-nome" id="spPacNome"></div>
-  <div class="sp-frase">"Cuidar com amor é o maior presente<br>que você pode oferecer."</div>
-  <div class="sp-toque">✦ Toque para continuar ✦</div>
-  <div class="sp-dots">
-    <div class="sp-dot ativo" id="spD1"></div>
-    <div class="sp-dot" id="spD2"></div>
-    <div class="sp-dot" id="spD3"></div>
+  <!-- Nome do app -->
+  <div style="font-size:30px;font-weight:800;color:#ffffff;letter-spacing:-.5px;margin-top:20px;">CuidarJuntos</div>
+  <div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:500;margin-top:4px;text-transform:uppercase;letter-spacing:.12em;">Sistema de Cuidado Familiar</div>
+  <!-- Linha divisória -->
+  <div style="width:40px;height:2px;background:rgba(255,255,255,.25);border-radius:2px;margin-top:22px;"></div>
+  <!-- Nome do paciente -->
+  <div id="spPacNome" style="font-size:15px;font-weight:600;color:rgba(255,255,255,.9);margin-top:14px;min-height:20px;"></div>
+  <!-- Frase -->
+  <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:10px;font-style:italic;text-align:center;max-width:260px;line-height:1.7;padding:0 24px;">"Cuidar com amor é o maior presente que você pode oferecer."</div>
+  <!-- Instrução -->
+  <div style="margin-top:36px;font-size:12px;color:rgba(255,255,255,.45);letter-spacing:.06em;">✦ Toque para continuar ✦</div>
+  <!-- Dots -->
+  <div style="display:flex;gap:8px;margin-top:14px;">
+    <div id="spD1" style="width:18px;height:7px;border-radius:4px;background:#ffffff;transition:all .4s;"></div>
+    <div id="spD2" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .4s;"></div>
+    <div id="spD3" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .4s;"></div>
   </div>
 </div>
 
@@ -4571,11 +4578,17 @@ document.addEventListener('DOMContentLoaded',function(){
   const nomePac=localStorage.getItem('cj_pacNome')||'';
   const el=document.getElementById('spPacNome');
   if(el&&nomePac) el.textContent='Cuidando de '+nomePac;
-  // Dots animados
+  // Dots animados via inline style
   const d1=document.getElementById('spD1'),d2=document.getElementById('spD2'),d3=document.getElementById('spD3');
   if(d1&&d2&&d3){
-    setTimeout(()=>{d1.classList.remove('ativo');d2.classList.add('ativo');},20000);
-    setTimeout(()=>{d2.classList.remove('ativo');d3.classList.add('ativo');},40000);
+    setTimeout(()=>{
+      d1.style.width='7px';d1.style.borderRadius='50%';d1.style.background='rgba(255,255,255,.3)';
+      d2.style.width='18px';d2.style.borderRadius='4px';d2.style.background='#ffffff';
+    },20000);
+    setTimeout(()=>{
+      d2.style.width='7px';d2.style.borderRadius='50%';d2.style.background='rgba(255,255,255,.3)';
+      d3.style.width='18px';d3.style.borderRadius='4px';d3.style.background='#ffffff';
+    },40000);
   }
   // Fecha automaticamente em 60s (ou ao tocar)
   _splashTimer=setTimeout(fecharSplash,60000);
