@@ -706,10 +706,36 @@ select.inp{cursor:pointer;}
   <div id="spPacNome" style="font-size:15px;font-weight:600;color:rgba(255,255,255,.9);margin-top:14px;min-height:20px;"></div>
   <!-- Frase -->
   <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:10px;font-style:italic;text-align:center;max-width:260px;line-height:1.7;padding:0 24px;">"Cuidar com amor é o maior presente que você pode oferecer."</div>
-  <!-- Instrução -->
-  <div style="margin-top:36px;font-size:12px;color:rgba(255,255,255,.45);letter-spacing:.06em;">✦ Toque para continuar ✦</div>
+  <!-- Botão instalar -->
+  <div style="margin-top:32px;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;padding:0 32px;">
+    <button id="splashInstallBtn" onclick="clicarInstalar(event)"
+      style="display:none;width:100%;max-width:280px;padding:15px 20px;
+             background:linear-gradient(135deg,#ffffff,#E3F2FD);
+             color:#0D47A1;border:none;border-radius:14px;
+             font-size:15px;font-weight:800;cursor:pointer;
+             font-family:system-ui,Arial,sans-serif;
+             box-shadow:0 6px 24px rgba(0,0,0,.3);
+             display:flex;align-items:center;justify-content:center;gap:10px;
+             letter-spacing:-.2px;">
+      <span style="font-size:20px;">📲</span> Salvar na Tela Inicial
+    </button>
+    <div id="splashIosBtn" onclick="clicarInstalar(event)"
+      style="display:none;width:100%;max-width:280px;padding:15px 20px;
+             background:linear-gradient(135deg,#ffffff,#E3F2FD);
+             color:#0D47A1;border:none;border-radius:14px;
+             font-size:15px;font-weight:800;cursor:pointer;
+             font-family:system-ui,Arial,sans-serif;
+             box-shadow:0 6px 24px rgba(0,0,0,.3);
+             display:none;align-items:center;justify-content:center;gap:10px;
+             text-align:center;">
+      <span style="font-size:20px;">📲</span> Salvar na Tela Inicial
+    </div>
+    <div onclick="fecharSplash()" style="font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;padding:6px 12px;letter-spacing:.04em;">
+      Entrar sem instalar →
+    </div>
+  </div>
   <!-- Dots -->
-  <div style="display:flex;gap:8px;margin-top:14px;">
+  <div style="display:flex;gap:8px;margin-top:16px;">
     <div id="spD1" style="width:18px;height:7px;border-radius:4px;background:#ffffff;transition:all .4s;"></div>
     <div id="spD2" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .4s;"></div>
     <div id="spD3" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .4s;"></div>
@@ -4695,6 +4721,9 @@ function fazerLogout(){
 // SERVICE WORKER + INSTALAÇÃO PWA
 // ═══════════════════════════════════════════
 var _deferredPrompt=null;
+var _isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent.toLowerCase());
+var _jaInstalado=('standalone' in navigator && navigator.standalone)||
+                 window.matchMedia('(display-mode: standalone)').matches;
 
 (function(){
   // Registra service worker
@@ -4702,49 +4731,45 @@ var _deferredPrompt=null;
     navigator.serviceWorker.register('./sw.js').catch(function(){});
   }
 
-  // Detecta iOS
-  var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  var isInStandalone=('standalone' in navigator && navigator.standalone);
+  if(_jaInstalado) return; // já está instalado — não mostra nada
 
-  // Se já está instalado, não mostra banner
-  if(isInStandalone || window.matchMedia('(display-mode: standalone)').matches) return;
-
-  if(isIOS){
-    // iOS: mostra banner com instruções manuais após 3s
-    setTimeout(function(){
-      var b=document.getElementById('iosBanner');
-      if(b && !localStorage.getItem('cj_ios_banner_fechado')) b.classList.add('on');
-    },3000);
+  if(_isIOS){
+    // iOS: mostra botão no splash assim que a tela aparecer
+    document.addEventListener('DOMContentLoaded',function(){
+      var btn=document.getElementById('splashIosBtn');
+      if(btn) btn.style.display='flex';
+    });
   } else {
-    // Android/Chrome: captura o evento de instalação
+    // Android/Chrome: captura evento e mostra botão no splash
     window.addEventListener('beforeinstallprompt',function(e){
       e.preventDefault();
       _deferredPrompt=e;
-      setTimeout(function(){
-        var b=document.getElementById('installBanner');
-        if(b && !localStorage.getItem('cj_banner_fechado')) b.classList.add('on');
-      },3000);
+      var btn=document.getElementById('splashInstallBtn');
+      if(btn) btn.style.display='flex';
     });
   }
 })();
 
-function instalarApp(){
-  if(!_deferredPrompt) return;
-  _deferredPrompt.prompt();
-  _deferredPrompt.userChoice.then(function(r){
-    if(r.outcome==='accepted') fecharBannerInstall();
-    _deferredPrompt=null;
-  });
+function clicarInstalar(e){
+  e.stopPropagation(); // não fecha o splash ao clicar no botão
+  if(_isIOS){
+    // Mostra modal de instrução iOS
+    document.getElementById('iosBanner').classList.add('on');
+  } else if(_deferredPrompt){
+    _deferredPrompt.prompt();
+    _deferredPrompt.userChoice.then(function(r){
+      _deferredPrompt=null;
+      if(r.outcome==='accepted') fecharSplash();
+    });
+  }
 }
 function fecharBannerInstall(){
   var b=document.getElementById('installBanner');
   if(b) b.classList.remove('on');
-  localStorage.setItem('cj_banner_fechado','1');
 }
 function fecharBannerIOS(){
   var b=document.getElementById('iosBanner');
   if(b) b.classList.remove('on');
-  localStorage.setItem('cj_ios_banner_fechado','1');
 }
 </script>
 
