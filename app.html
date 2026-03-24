@@ -541,9 +541,95 @@ select.inp{cursor:pointer;}
 .dev-info span{color:var(--t2);}
 
 #fotoInputLg{display:none;}
+
+/* ═══════════════════════════════════════════
+   SPLASH SCREEN
+═══════════════════════════════════════════ */
+#splashScreen{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(160deg,#0D47A1 0%,#1565C0 50%,#1976D2 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;transition:opacity .5s ease;
+}
+#splashScreen.fade-out{opacity:0;pointer-events:none;}
+#splashScreen.oculto{display:none;}
+#splashCanvas{width:120px;height:120px;border-radius:28px;box-shadow:0 8px 32px rgba(0,0,0,.3);}
+.sp-app-nome{font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px;margin-top:18px;}
+.sp-app-sub{font-size:12px;color:rgba(255,255,255,.65);font-weight:400;margin-top:4px;text-transform:uppercase;letter-spacing:.1em;}
+.sp-pac-nome{font-size:16px;font-weight:600;color:rgba(255,255,255,.9);margin-top:20px;}
+.sp-frase{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;font-style:italic;text-align:center;max-width:260px;line-height:1.5;}
+.sp-dots{display:flex;gap:6px;margin-top:32px;}
+.sp-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);}
+.sp-dot.ativo{background:#fff;width:18px;border-radius:3px;transition:width .3s;}
+
+/* ═══════════════════════════════════════════
+   MODAL RECORTE DE FOTO
+═══════════════════════════════════════════ */
+#cropModal{
+  position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.9);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+}
+#cropModal.on{display:flex;}
+.crop-header{width:100%;max-width:380px;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;}
+.crop-header span{color:#fff;font-size:14px;font-weight:600;}
+.crop-header button{background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;cursor:pointer;padding:4px;}
+.crop-area{
+  width:280px;height:280px;border-radius:50%;overflow:hidden;
+  border:3px solid rgba(255,255,255,.5);position:relative;cursor:grab;
+  touch-action:none;user-select:none;flex-shrink:0;
+  box-shadow:0 0 0 2000px rgba(0,0,0,.7);
+}
+.crop-area:active{cursor:grabbing;}
+#cropCanvas{position:absolute;top:0;left:0;}
+.crop-hint{color:rgba(255,255,255,.5);font-size:11px;margin-top:14px;text-align:center;}
+.crop-zoom{display:flex;align-items:center;gap:10px;margin-top:12px;width:260px;}
+.crop-zoom label{color:rgba(255,255,255,.6);font-size:11px;flex-shrink:0;}
+.crop-zoom input[type=range]{flex:1;accent-color:#42A5F5;}
+.crop-footer{display:flex;gap:12px;margin-top:20px;}
+.crop-btn{padding:11px 28px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+.crop-btn.cancel{background:rgba(255,255,255,.1);color:#fff;}
+.crop-btn.ok{background:#1565C0;color:#fff;}
 </style>
 </head>
 <body>
+<!-- ════════════════════════════════════════
+     SPLASH SCREEN
+════════════════════════════════════════ -->
+<div id="splashScreen">
+  <canvas id="splashCanvas" width="120" height="120"></canvas>
+  <div class="sp-app-nome">CuidarJuntos</div>
+  <div class="sp-app-sub">Sistema de Cuidado Familiar</div>
+  <div class="sp-pac-nome" id="spPacNome"></div>
+  <div class="sp-frase" id="spFrase">Cuidar com amor é o maior presente que você pode oferecer.</div>
+  <div class="sp-dots">
+    <div class="sp-dot ativo" id="spD1"></div>
+    <div class="sp-dot" id="spD2"></div>
+    <div class="sp-dot" id="spD3"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MODAL RECORTE DE FOTO
+════════════════════════════════════════ -->
+<div id="cropModal">
+  <div class="crop-header">
+    <span>Ajustar foto</span>
+    <button onclick="fecharCrop()">✕</button>
+  </div>
+  <div class="crop-area" id="cropArea">
+    <canvas id="cropCanvas" width="280" height="280"></canvas>
+  </div>
+  <div class="crop-hint">Arraste para centralizar · Pinça para zoom</div>
+  <div class="crop-zoom">
+    <label>Zoom</label>
+    <input type="range" id="cropZoom" min="0.5" max="3" step="0.01" value="1" oninput="atualizarCrop()"/>
+  </div>
+  <div class="crop-footer">
+    <button class="crop-btn cancel" onclick="fecharCrop()">Cancelar</button>
+    <button class="crop-btn ok" onclick="confirmarCrop()">Usar foto</button>
+  </div>
+</div>
+
 <!-- ════════════════════════════════════════
      TELA DE LOGIN
 ════════════════════════════════════════ -->
@@ -2917,17 +3003,95 @@ function toggleFotoMenu(e){
 function fecharFotoMenu(){document.getElementById('fotoMenu').classList.remove('on');}
 document.addEventListener('click',fecharFotoMenu);
 function abrirFoto(){fecharFotoMenu();document.getElementById('fotoInputLg').click();}
+// ─── Variáveis do recorte ───
+let _cropImg=null, _cropX=0, _cropY=0, _cropScale=1;
+let _cropDrag=false, _cropLX=0, _cropLY=0;
+let _cropPinchDist=0;
+
 function carregarFoto(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=ev=>{
-    document.getElementById('fotoImg').src=ev.target.result;
-    document.getElementById('fotoImg').style.display='block';
-    document.getElementById('fotoPH').style.display='none';
-    localStorage.setItem('cj_foto',ev.target.result);
+    const img=new Image();
+    img.onload=()=>{
+      _cropImg=img;
+      // Escala inicial para preencher o círculo
+      const s=280;
+      _cropScale=Math.max(s/img.width, s/img.height);
+      _cropX=(s-img.width*_cropScale)/2;
+      _cropY=(s-img.height*_cropScale)/2;
+      document.getElementById('cropZoom').min=_cropScale*0.5;
+      document.getElementById('cropZoom').max=_cropScale*4;
+      document.getElementById('cropZoom').step=_cropScale*0.01;
+      document.getElementById('cropZoom').value=_cropScale;
+      atualizarCrop();
+      document.getElementById('cropModal').classList.add('on');
+    };
+    img.src=ev.target.result;
   };
   r.readAsDataURL(f);e.target.value='';
 }
+function atualizarCrop(){
+  if(!_cropImg)return;
+  const cv=document.getElementById('cropCanvas');
+  const g=cv.getContext('2d');
+  const s=_cropScale=parseFloat(document.getElementById('cropZoom').value);
+  g.clearRect(0,0,280,280);
+  g.drawImage(_cropImg,_cropX,_cropY,_cropImg.width*s,_cropImg.height*s);
+}
+function fecharCrop(){document.getElementById('cropModal').classList.remove('on');}
+function confirmarCrop(){
+  const cv=document.getElementById('cropCanvas');
+  // Recorte circular via canvas offscreen
+  const out=document.createElement('canvas');out.width=out.height=280;
+  const g=out.getContext('2d');
+  g.beginPath();g.arc(140,140,140,0,Math.PI*2);g.clip();
+  g.drawImage(cv,0,0);
+  const dataUrl=out.toDataURL('image/jpeg',0.85);
+  document.getElementById('fotoImg').src=dataUrl;
+  document.getElementById('fotoImg').style.display='block';
+  document.getElementById('fotoPH').style.display='none';
+  localStorage.setItem('cj_foto',dataUrl);
+  fecharCrop();
+}
+// Drag no desktop
+(function(){
+  const area=document.getElementById('cropArea');
+  area.addEventListener('mousedown',e=>{_cropDrag=true;_cropLX=e.clientX;_cropLY=e.clientY;});
+  document.addEventListener('mouseup',()=>{_cropDrag=false;});
+  document.addEventListener('mousemove',e=>{
+    if(!_cropDrag)return;
+    _cropX+=e.clientX-_cropLX;_cropY+=e.clientY-_cropLY;
+    _cropLX=e.clientX;_cropLY=e.clientY;atualizarCrop();
+  });
+  // Touch drag + pinch
+  area.addEventListener('touchstart',e=>{
+    if(e.touches.length===1){_cropDrag=true;_cropLX=e.touches[0].clientX;_cropLY=e.touches[0].clientY;}
+    if(e.touches.length===2){
+      _cropPinchDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    }
+    e.preventDefault();
+  },{passive:false});
+  area.addEventListener('touchend',()=>{_cropDrag=false;_cropPinchDist=0;});
+  area.addEventListener('touchmove',e=>{
+    if(e.touches.length===1&&_cropDrag){
+      _cropX+=e.touches[0].clientX-_cropLX;_cropY+=e.touches[0].clientY-_cropLY;
+      _cropLX=e.touches[0].clientX;_cropLY=e.touches[0].clientY;atualizarCrop();
+    }
+    if(e.touches.length===2){
+      const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+      if(_cropPinchDist){
+        const zEl=document.getElementById('cropZoom');
+        const nv=parseFloat(zEl.value)*(d/_cropPinchDist);
+        zEl.value=Math.min(Math.max(nv,parseFloat(zEl.min)),parseFloat(zEl.max));
+        _cropScale=parseFloat(zEl.value);atualizarCrop();
+      }
+      _cropPinchDist=d;
+    }
+    e.preventDefault();
+  },{passive:false});
+})();
+
 function excluirFoto(){
   fecharFotoMenu();
   document.getElementById('fotoImg').style.display='none';
@@ -4393,6 +4557,52 @@ function setupPWA(){
   document.head.appendChild(ml);
 }
 document.addEventListener('DOMContentLoaded', setupPWA);
+
+// ═══════════════════════════════════════════
+// SPLASH SCREEN
+// ═══════════════════════════════════════════
+(function iniciarSplash(){
+  // Desenha ícone no canvas da splash
+  const cv=document.getElementById('splashCanvas');
+  if(!cv)return;
+  const g=cv.getContext('2d');
+  const S=120;
+  // Fundo degradê
+  const bg=g.createLinearGradient(0,0,S,S);
+  bg.addColorStop(0,'#0D47A1');bg.addColorStop(1,'#1976D2');
+  const r=22;
+  g.fillStyle=bg;
+  g.beginPath();
+  g.moveTo(r,0);g.lineTo(S-r,0);g.quadraticCurveTo(S,0,S,r);
+  g.lineTo(S,S-r);g.quadraticCurveTo(S,S,S-r,S);
+  g.lineTo(r,S);g.quadraticCurveTo(0,S,0,S-r);
+  g.lineTo(0,r);g.quadraticCurveTo(0,0,r,0);
+  g.closePath();g.fill();
+  // Coração
+  const cx=S/2,cy=46,hs=38;
+  const cor=(ctx,x,y,t,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x,y+t*.45);ctx.bezierCurveTo(x-t*.85,y+t*.05,x-t,y-t*.38,x-t*.5,y-t*.38);ctx.bezierCurveTo(x-t*.2,y-t*.38,x,y-t*.08,x,y-t*.08);ctx.bezierCurveTo(x,y-t*.08,x+t*.2,y-t*.38,x+t*.5,y-t*.38);ctx.bezierCurveTo(x+t,y-t*.38,x+t*.85,y+t*.05,x,y+t*.45);ctx.fill();};
+  cor(g,cx+2,cy+3,hs,'rgba(0,0,0,.15)');
+  cor(g,cx,cy,hs,'#ffffff');
+  // Cruz
+  g.fillStyle='#1565C0';
+  g.fillRect(cx-6,cy-18,12,36);g.fillRect(cx-18,cy-6,36,12);
+  // Texto
+  g.fillStyle='#fff';g.font='bold 11px Arial';g.textAlign='center';g.textBaseline='middle';
+  g.fillText('CuidarJuntos',cx,S-13);
+
+  // Nome do paciente
+  const nomePac=localStorage.getItem('cj_pacNome')||'';
+  if(nomePac) document.getElementById('spPacNome').textContent='Cuidando de '+nomePac;
+
+  // Animação dos dots e fechamento
+  const d1=document.getElementById('spD1'),d2=document.getElementById('spD2'),d3=document.getElementById('spD3');
+  setTimeout(()=>{d1.classList.remove('ativo');d2.classList.add('ativo');},700);
+  setTimeout(()=>{d2.classList.remove('ativo');d3.classList.add('ativo');},1400);
+  setTimeout(()=>{
+    document.getElementById('splashScreen').classList.add('fade-out');
+    setTimeout(()=>{document.getElementById('splashScreen').classList.add('oculto');},520);
+  },2200);
+})();
 
 // ═══════════════════════════════════════════
 // LOGOUT
