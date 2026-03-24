@@ -4596,12 +4596,12 @@ document.addEventListener('DOMContentLoaded', setupPWA);
 
   // Animação dos dots e fechamento
   const d1=document.getElementById('spD1'),d2=document.getElementById('spD2'),d3=document.getElementById('spD3');
-  setTimeout(()=>{d1.classList.remove('ativo');d2.classList.add('ativo');},700);
-  setTimeout(()=>{d2.classList.remove('ativo');d3.classList.add('ativo');},1400);
+  setTimeout(()=>{d1.classList.remove('ativo');d2.classList.add('ativo');},1500);
+  setTimeout(()=>{d2.classList.remove('ativo');d3.classList.add('ativo');},3000);
   setTimeout(()=>{
     document.getElementById('splashScreen').classList.add('fade-out');
     setTimeout(()=>{document.getElementById('splashScreen').classList.add('oculto');},520);
-  },2200);
+  },4800);
 })();
 
 // ═══════════════════════════════════════════
