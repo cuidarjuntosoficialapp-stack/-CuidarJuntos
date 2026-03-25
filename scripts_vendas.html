@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Scripts de Vendas + Checklist — CuidarJuntos</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0A0F1A;font-family:system-ui,Arial,sans-serif;padding:28px 12px 60px;color:#fff;}
+h1{font-size:18px;font-weight:800;text-align:center;margin-bottom:4px;}
+.sub{color:rgba(255,255,255,.4);font-size:11px;text-align:center;margin-bottom:36px;}
+.section{max-width:860px;margin:0 auto 40px;}
+.section-title{font-size:13px;font-weight:700;color:#90CAF9;text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card{background:#0E1A2E;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;margin-bottom:16px;}
+.card h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;}
+.card .desc{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:16px;}
+.msg{background:#1A2E4A;border-radius:10px;padding:16px;font-size:13px;color:rgba(255,255,255,.85);line-height:1.8;white-space:pre-wrap;border-left:3px solid #1E88E5;}
+.btn-copy{background:rgba(30,136,229,.2);border:1px solid rgba(30,136,229,.4);color:#90CAF9;border-radius:8px;padding:8px 18px;font-size:11px;font-weight:700;cursor:pointer;margin-top:12px;font-family:inherit;}
+.btn-copy:hover{background:rgba(30,136,229,.35);}
+.btn-copy.copied{background:rgba(76,175,80,.2);border-color:rgba(76,175,80,.4);color:#A5D6A7;}
+
+/* CHECKLIST */
+.checklist{list-style:none;}
+.checklist li{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.checklist li:last-child{border-bottom:none;}
+.check-box{width:22px;height:22px;border:2px solid rgba(30,136,229,.5);border-radius:6px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.check-box.done{background:#1565C0;border-color:#1565C0;}
+.check-text{flex:1;}
+.check-text strong{font-size:13px;font-weight:700;display:block;margin-bottom:2px;}
+.check-text span{font-size:11px;color:rgba(255,255,255,.45);}
+.check-cat{font-size:10px;font-weight:700;color:#64B5F6;background:rgba(100,181,246,.1);border-radius:4px;padding:2px 8px;flex-shrink:0;margin-top:4px;}
+</style>
+</head>
+<body>
+
+<h1>📋 Scripts de Vendas + Checklist de Entrega</h1>
+<p class="sub">CuidarJuntos · RSO Soluções · Use estes textos prontos para vender e entregar com profissionalismo</p>
+
+<!-- ══════════ ABORDAGEM INICIAL ══════════ -->
+<div class="section">
+  <div class="section-title">💬 1. Abordagem Inicial no WhatsApp</div>
+
+  <div class="card">
+    <h3>Mensagem Fria — Para quem você não conhece</h3>
+    <div class="desc">Use quando identificar uma família que cuida de idoso nas redes sociais ou grupos</div>
+    <div class="msg" id="m1">Olá, [NOME]! Tudo bem? 😊
+
+Me chamo Renata, sou de MG e desenvolvo soluções digitais para famílias que cuidam de idosos.
+
+Vi que você cuida do(a) seu(sua) [familiar] — quero te mostrar algo que pode facilitar muito a rotina de vocês.
+
+Posso te enviar uma apresentação rápida?</div>
+    <button class="btn-copy" onclick="copiar('m1',this)">📋 Copiar Mensagem</button>
+  </div>
+
+  <div class="card">
+    <h3>Mensagem Quente — Para quem já demonstrou interesse</h3>
+    <div class="desc">Use quando alguém interagiu com seu conteúdo ou pediu mais informações</div>
+    <div class="msg" id="m2">Olá, [NOME]! 💙
+
+Obrigada pelo interesse no CuidarJuntos!
+
+Deixa eu te explicar rapidinho: é um aplicativo completo para famílias que cuidam de idosos. Funciona direto no celular, sem precisar instalar nada de loja de app.
+
+Com ele, toda a família acompanha em tempo real:
+✅ Medicamentos e confirmações
+✅ Pressão, glicose e sinais vitais
+✅ Consultas e exames
+✅ Despesas e contribuições de cada filho
+
+Posso te mostrar como funciona? Tenho uma demonstração disponível 😊</div>
+    <button class="btn-copy" onclick="copiar('m2',this)">📋 Copiar Mensagem</button>
+  </div>
+</div>
+
+<!-- ══════════ APRESENTAÇÃO ══════════ -->
+<div class="section">
+  <div class="section-title">📱 2. Apresentação do App (após despertar interesse)</div>
+
+  <div class="card">
+    <h3>Apresentação Completa com Link</h3>
+    <div class="desc">Envie após o cliente pedir mais informações ou confirmar interesse</div>
+    <div class="msg" id="m3">💙 *CuidarJuntos — Saúde e Finanças da Família*
+
+Olá, [NOME]! Vou te apresentar o app que vai transformar a forma como sua família cuida do(a) [familiar].
+
+*O que é o CuidarJuntos?*
+Um aplicativo completo e simples de usar, acessível por todos da família no celular — mesmo quem mora longe acompanha tudo em tempo real.
+
+*O que você vai ter:*
+💊 Controle de medicamentos com confirmação por horário
+❤️ Registro de sinais vitais com alertas automáticos
+🏥 Histórico completo de consultas e exames
+💰 Transparência financeira — quem pagou o quê
+🌙 Registro de cuidados diários (banho, alimentação, fisioterapia)
+🔔 Notificações para toda a família
+
+*Como funciona:*
+1️⃣ Eu configuro tudo para sua família (em até 24h)
+2️⃣ Cada filho recebe seu login
+3️⃣ Vocês instalam no celular com um toque
+4️⃣ Já podem usar imediatamente
+
+*Investimento:*
+⚡ R$197 de ativação (configuração completa, única vez)
+💙 + R$79/mês (acesso, suporte e atualizações)
+
+Quer ver uma demonstração antes? 👇
+https://cuidarjuntosoficialapp-stack.github.io/-CuidarJuntos/
+
+Qualquer dúvida é só perguntar! 😊</div>
+    <button class="btn-copy" onclick="copiar('m3',this)">📋 Copiar Mensagem</button>
+  </div>
+</div>
+
+<!-- ══════════ OBJEÇÕES ══════════ -->
+<div class="section">
+  <div class="section-title">🛡️ 3. Respostas para Objeções Comuns</div>
+
+  <div class="card">
+    <h3>"Está caro"</h3>
+    <div class="msg" id="m4">Entendo, [NOME]! 😊
+
+Pensa assim: R$79 por mês é menos do que uma única consulta médica particular.
+
+E com o app, você evita remédios dados errado, organiza as finanças da família sem conflito, acompanha a saúde do(a) [familiar] de qualquer lugar...
+
+Muitas famílias nos contam que economizaram muito mais do que isso só evitando erros e desorganização.
+
+Mas se preferir, você pode começar só com a ativação (R$197) e avaliar sem compromisso com a mensalidade. O que acha?</div>
+    <button class="btn-copy" onclick="copiar('m4',this)">📋 Copiar Mensagem</button>
+  </div>
+
+  <div class="card">
+    <h3>"Não sei usar tecnologia"</h3>
+    <div class="msg" id="m5">Não tem problema nenhum, [NOME]! 😊
+
+O CuidarJuntos foi feito pensando em pessoas que não são acostumadas com tecnologia. É tudo muito simples e visual.
+
+Além disso, eu faço toda a configuração para vocês — entrego pronto. E qualquer dúvida que surgir, é só me chamar aqui no WhatsApp que eu ajudo!
+
+Quer que eu te mostre como é simples de usar? Posso te passar o link da demonstração 👇</div>
+    <button class="btn-copy" onclick="copiar('m5',this)">📋 Copiar Mensagem</button>
+  </div>
+
+  <div class="card">
+    <h3>"Vou pensar"</h3>
+    <div class="msg" id="m6">Claro, [NOME], sem pressa! 😊
+
+Só quero deixar uma coisa — enquanto a família ainda está desorganizada, coisas importantes podem passar: um remédio esquecido, uma despesa não registrada, um sinal vital que ninguém percebeu.
+
+O CuidarJuntos resolve tudo isso de uma vez, e eu configuro tudo para vocês em menos de 24 horas.
+
+Se surgir qualquer dúvida, pode me chamar a qualquer hora. Estou aqui! 💙</div>
+    <button class="btn-copy" onclick="copiar('m6',this)">📋 Copiar Mensagem</button>
+  </div>
+
+  <div class="card">
+    <h3>"Como faço para pagar?"</h3>
+    <div class="msg" id="m7">Pagamento é pelo PIX, bem simples! 😊
+
+*Ativação:* R$197 (única vez)
+*Mensalidade:* R$79/mês (cobrada mensalmente)
+
+Após o pagamento da ativação, começo a configurar imediatamente e em até 24 horas sua família já está usando o app.
+
+Quer confirmar? Me passa seu nome completo para eu gerar o PIX 💙</div>
+    <button class="btn-copy" onclick="copiar('m7',this)">📋 Copiar Mensagem</button>
+  </div>
+</div>
+
+<!-- ══════════ PÓS-VENDA ══════════ -->
+<div class="section">
+  <div class="section-title">✅ 4. Mensagem de Confirmação de Pagamento</div>
+  <div class="card">
+    <h3>Após receber o pagamento</h3>
+    <div class="msg" id="m8">💙 *Pagamento confirmado! Seja bem-vindo(a) à família CuidarJuntos!*
+
+Olá, [NOME]! Recebi o pagamento e já vou começar a configurar tudo para a sua família.
+
+Em até 24 horas você recebe:
+✅ O link do aplicativo pronto para usar
+✅ Os logins de cada membro da família
+✅ Um guia passo a passo de como começar
+✅ Meu contato direto para qualquer dúvida
+
+Obrigada pela confiança! Vou cuidar de tudo com muito carinho 😊
+— Renata</div>
+    <button class="btn-copy" onclick="copiar('m8',this)">📋 Copiar Mensagem</button>
+  </div>
+</div>
+
+<!-- ══════════ CHECKLIST ══════════ -->
+<div class="section">
+  <div class="section-title">☑️ 5. Checklist de Onboarding — Entrega ao Cliente</div>
+  <div class="card">
+    <div class="desc" style="margin-bottom:20px;">Marque cada etapa conforme for concluindo. Clique nas caixas para marcar.</div>
+    <ul class="checklist">
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Receber pagamento da ativação (R$197)</strong><span>Confirmar PIX recebido antes de iniciar</span></div>
+        <div class="check-cat">💳 Financeiro</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Criar a planilha Google Sheets para a família</strong><span>Usar o Google Apps Script para inicializar todas as abas</span></div>
+        <div class="check-cat">⚙️ Config</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Publicar o GAS e obter a URL do sistema</strong><span>Deploy como web app com acesso "Qualquer pessoa"</span></div>
+        <div class="check-cat">⚙️ Config</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Cadastrar os usuários na planilha (aba Usuários)</strong><span>Nome, e-mail, senha temporária e perfil (Filho/Enfermagem)</span></div>
+        <div class="check-cat">👥 Usuários</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Cadastrar o idoso (paciente) na planilha</strong><span>Nome completo, data de nascimento e informações básicas</span></div>
+        <div class="check-cat">👴 Paciente</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Configurar a cota mensal de cada filho</strong><span>Valor que cada filho contribui por mês</span></div>
+        <div class="check-cat">💰 Financeiro</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Testar o login com um usuário de teste</strong><span>Confirmar que o app conecta, faz login e salva dados</span></div>
+        <div class="check-cat">🧪 Teste</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Enviar mensagem de boas-vindas coletiva (WhatsApp)</strong><span>Com link do app, URL do sistema e link da planilha</span></div>
+        <div class="check-cat">📲 Entrega</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Enviar login individual para cada filho</strong><span>Usuário, senha temporária e lembrete para trocar a senha</span></div>
+        <div class="check-cat">📲 Entrega</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Enviar imagem de boas-vindas (Modelo 2)</strong><span>A imagem escolhida junto com o texto personalizado</span></div>
+        <div class="check-cat">📲 Entrega</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Acompanhar o primeiro acesso da família</strong><span>Estar disponível nas primeiras 24h para tirar dúvidas</span></div>
+        <div class="check-cat">🤝 Suporte</div>
+      </li>
+      <li>
+        <div class="check-box" onclick="marcar(this)"></div>
+        <div class="check-text"><strong>Confirmar data de cobrança da mensalidade (R$79)</strong><span>Informar ao cliente quando será o próximo PIX</span></div>
+        <div class="check-cat">💳 Financeiro</div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function copiar(id, btn){
+  const txt = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(txt).then(()=>{
+    btn.textContent = '✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='📋 Copiar Mensagem'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function marcar(box){
+  box.classList.toggle('done');
+  box.textContent = box.classList.contains('done') ? '✓' : '';
+}
+</script>
+</body>
+</html>

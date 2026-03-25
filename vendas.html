@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CuidarJuntos — Organize a Saúde e as Finanças do seu Familiar</title>
+<meta name="description" content="Aplicativo completo para famílias que cuidam de idosos. Saúde, medicamentos, finanças e muito mais — tudo em um só lugar."/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --azul:#0D47A1;--azul-m:#1565C0;--azul-c:#1E88E5;--azul-cl:#E3F2FD;
+  --vermelho:#EF5350;--branco:#fff;--cinza:#546E7A;--fundo:#F8FBFF;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--branco);color:#1A2A3A;line-height:1.6;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(13,71,161,.97);backdrop-filter:blur(8px);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;}
+.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:17px;text-decoration:none;}
+.nav-cta{background:#fff;color:var(--azul);border:none;border-radius:24px;padding:9px 22px;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;}
+.nav-cta:hover{background:#E3F2FD;}
+
+/* HERO */
+.hero{background:linear-gradient(145deg,#0A1E3D 0%,#0D47A1 55%,#1565C0 100%);padding:120px 24px 80px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-40%;left:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);border-radius:50%;}
+.hero::after{content:'';position:absolute;bottom:-20%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(239,83,80,.1) 0%,transparent 70%);border-radius:50%;}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 18px;font-size:12px;color:rgba(255,255,255,.85);margin-bottom:24px;}
+.hero h1{font-size:clamp(28px,5vw,52px);font-weight:900;color:#fff;line-height:1.2;margin-bottom:20px;position:relative;}
+.hero h1 span{color:#64B5F6;}
+.hero p{font-size:clamp(15px,2.5vw,20px);color:rgba(255,255,255,.8);max-width:640px;margin:0 auto 36px;}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.btn-primary{background:#fff;color:var(--azul);border:none;border-radius:32px;padding:16px 36px;font-size:16px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block;box-shadow:0 4px 20px rgba(0,0,0,.2);}
+.btn-primary:hover{background:#E3F2FD;transform:translateY(-2px);}
+.btn-secondary{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4);border-radius:32px;padding:14px 32px;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;}
+.btn-secondary:hover{background:rgba(255,255,255,.08);}
+.hero-phones{margin-top:56px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap;}
+.phone-mock{width:160px;background:linear-gradient(160deg,#0D47A1,#061730);border-radius:24px;padding:16px 12px;box-shadow:0 16px 48px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);}
+.phone-mock-label{font-size:9px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;}
+.pm-row{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border-radius:8px;padding:7px 8px;margin-bottom:5px;}
+.pm-dot{width:8px;height:8px;border-radius:50%;}
+.pm-line{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.15);}
+.pm-val{font-size:9px;color:#fff;font-weight:700;}
+
+/* DOR */
+.dor{background:var(--fundo);padding:72px 24px;}
+.container{max-width:960px;margin:0 auto;}
+.section-tag{display:inline-block;background:#FFF3E0;color:#E65100;border-radius:12px;padding:4px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;}
+.section-tag.azul{background:#E3F2FD;color:var(--azul-m);}
+.section-tag.verde{background:#E8F5E9;color:#2E7D32;}
+h2{font-size:clamp(22px,3.5vw,36px);font-weight:800;margin-bottom:16px;line-height:1.3;}
+.dor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:36px;}
+.dor-card{background:#fff;border:1px solid #E0E7EF;border-radius:16px;padding:24px;display:flex;gap:14px;}
+.dor-icon{font-size:28px;flex-shrink:0;}
+.dor-card h3{font-size:15px;font-weight:700;margin-bottom:4px;color:#1A2A3A;}
+.dor-card p{font-size:13px;color:var(--cinza);line-height:1.5;}
+
+/* SOLUÇÃO */
+.solucao{padding:80px 24px;text-align:center;}
+.solucao p.lead{font-size:18px;color:var(--cinza);max-width:600px;margin:0 auto 48px;}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
+.feat-card{background:var(--fundo);border-radius:20px;padding:28px 20px;text-align:center;transition:transform .2s,box-shadow .2s;}
+.feat-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(13,71,161,.12);}
+.feat-icon{font-size:36px;margin-bottom:14px;}
+.feat-card h3{font-size:15px;font-weight:700;margin-bottom:6px;color:#1A2A3A;}
+.feat-card p{font-size:13px;color:var(--cinza);}
+
+/* COMO FUNCIONA */
+.como{background:linear-gradient(135deg,#0A1E3D,#0D47A1);padding:80px 24px;text-align:center;}
+.como h2{color:#fff;}
+.como p.lead{color:rgba(255,255,255,.7);max-width:560px;margin:0 auto 48px;}
+.steps{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;}
+.step{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 20px;width:200px;text-align:center;}
+.step-num{width:40px;height:40px;border-radius:50%;background:var(--azul-c);color:#fff;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.step h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;}
+.step p{font-size:12px;color:rgba(255,255,255,.6);}
+.step-arrow{display:flex;align-items:center;color:rgba(255,255,255,.3);font-size:24px;padding-top:14px;}
+
+/* PROVA */
+.prova{padding:80px 24px;background:var(--fundo);}
+.prova-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:36px;}
+.prova-card{background:#fff;border-radius:20px;padding:28px;border:1px solid #E0E7EF;}
+.stars{color:#FFC107;font-size:16px;margin-bottom:10px;}
+.prova-card p{font-size:14px;color:var(--cinza);line-height:1.6;margin-bottom:16px;font-style:italic;}
+.prova-autor{display:flex;align-items:center;gap:10px;}
+.prova-avatar{width:40px;height:40px;border-radius:50%;background:var(--azul-cl);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.prova-nome{font-size:13px;font-weight:700;color:#1A2A3A;}
+.prova-desc{font-size:11px;color:var(--cinza);}
+
+/* PREÇO */
+.preco{padding:80px 24px;text-align:center;}
+.preco p.lead{font-size:17px;color:var(--cinza);max-width:520px;margin:0 auto 48px;}
+.planos{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;}
+.plano{background:#fff;border:2px solid #E0E7EF;border-radius:24px;padding:36px 32px;width:300px;text-align:center;position:relative;}
+.plano.destaque{border-color:var(--azul-m);box-shadow:0 8px 40px rgba(13,71,161,.15);}
+.plano-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--azul-m);color:#fff;border-radius:20px;padding:4px 18px;font-size:11px;font-weight:700;white-space:nowrap;}
+.plano-icon{font-size:36px;margin-bottom:12px;}
+.plano h3{font-size:17px;font-weight:800;margin-bottom:6px;}
+.plano-sub{font-size:13px;color:var(--cinza);margin-bottom:20px;}
+.plano-preco{font-size:42px;font-weight:900;color:var(--azul);line-height:1;}
+.plano-preco span{font-size:16px;font-weight:500;color:var(--cinza);}
+.plano-preco small{font-size:13px;font-weight:400;color:var(--cinza);display:block;margin-top:4px;}
+.plano-divider{border:none;border-top:1px solid #E0E7EF;margin:20px 0;}
+.plano ul{list-style:none;text-align:left;margin-bottom:24px;}
+.plano ul li{font-size:13px;color:#1A2A3A;padding:5px 0;display:flex;gap:8px;}
+.plano ul li::before{content:'✓';color:var(--azul-c);font-weight:700;flex-shrink:0;}
+.btn-plano{width:100%;background:linear-gradient(135deg,var(--azul-m),var(--azul-c));color:#fff;border:none;border-radius:32px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;display:block;}
+.btn-plano:hover{opacity:.9;}
+.btn-plano.outline{background:transparent;color:var(--azul);border:2px solid var(--azul-m);}
+.btn-plano.outline:hover{background:var(--azul-cl);}
+.preco-nota{margin-top:28px;font-size:13px;color:var(--cinza);}
+
+/* FAQ */
+.faq{padding:80px 24px;background:var(--fundo);}
+.faq-list{max-width:720px;margin:36px auto 0;}
+.faq-item{background:#fff;border:1px solid #E0E7EF;border-radius:16px;margin-bottom:12px;overflow:hidden;}
+.faq-q{width:100%;background:none;border:none;padding:20px 24px;text-align:left;font-size:15px;font-weight:600;color:#1A2A3A;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.faq-q:hover{background:var(--azul-cl);}
+.faq-icon{font-size:18px;color:var(--azul-m);font-weight:700;flex-shrink:0;}
+.faq-a{padding:0 24px 20px;font-size:14px;color:var(--cinza);line-height:1.7;}
+
+/* CTA FINAL */
+.cta-final{background:linear-gradient(135deg,#0A1E3D,#0D47A1);padding:80px 24px;text-align:center;}
+.cta-final h2{color:#fff;margin-bottom:14px;}
+.cta-final p{color:rgba(255,255,255,.75);font-size:17px;max-width:540px;margin:0 auto 36px;}
+.btn-wpp{background:#25D366;color:#fff;border:none;border-radius:32px;padding:18px 40px;font-size:17px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;box-shadow:0 6px 24px rgba(37,211,102,.35);}
+.btn-wpp:hover{background:#20BF5A;transform:translateY(-2px);}
+.cta-sub{margin-top:20px;font-size:13px;color:rgba(255,255,255,.5);}
+
+/* FOOTER */
+footer{background:#06101F;padding:32px 24px;text-align:center;}
+footer p{font-size:12px;color:rgba(255,255,255,.3);}
+footer a{color:rgba(255,255,255,.4);text-decoration:none;}
+
+/* RESPONSIVO */
+@media(max-width:600px){
+  .hero-btns{flex-direction:column;align-items:center;}
+  .steps{flex-direction:column;align-items:center;}
+  .step-arrow{display:none;}
+  .planos{flex-direction:column;align-items:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px;">
+      <defs><linearGradient id="nh" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1E88E5"/><stop offset="100%" stop-color="#0D3B8E"/></linearGradient></defs>
+      <path d="M50,83 C27,67 9,52 9,34 C9,20 20,11 33,11 C40,11 46,14 50,19 C54,14 60,11 67,11 C80,11 91,20 91,34 C91,52 73,67 50,83Z" fill="url(#nh)"/>
+      <polyline points="15,62 22,62 28,42 34,72 41,51 47,51 53,62 59,62 65,30 71,62 77,18 86,18" stroke="#EF5350" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    CuidarJuntos
+  </a>
+  <a class="nav-cta" href="https://wa.me/5531997035583?text=Olá+Renata!+Quero+conhecer+o+CuidarJuntos" target="_blank">Falar com Renata</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">💙 Para famílias que cuidam de idosos</div>
+  <h1>Cuide com mais <span>organização</span>,<br>tranquilidade e união</h1>
+  <p>O CuidarJuntos reúne saúde, medicamentos, consultas e finanças em um único aplicativo — acessível por toda a família, em tempo real.</p>
+  <div class="hero-btns">
+    <a class="btn-primary" href="https://wa.me/5531997035583?text=Olá+Renata!+Quero+o+CuidarJuntos" target="_blank">📲 Quero o App Agora</a>
+    <a class="btn-secondary" href="https://cuidarjuntosoficialapp-stack.github.io/-CuidarJuntos/" target="_blank">👀 Ver Demonstração</a>
+  </div>
+  <div class="hero-phones">
+    <div class="phone-mock">
+      <div class="phone-mock-label">❤️ Saúde</div>
+      <div class="pm-row"><div class="pm-dot" style="background:#EF5350;"></div><div class="pm-line"></div><div class="pm-val">120/80</div></div>
+      <div class="pm-row"><div class="pm-dot" style="background:#42A5F5;"></div><div class="pm-line"></div><div class="pm-val">98mg</div></div>
+      <div class="pm-row"><div class="pm-dot" style="background:#66BB6A;"></div><div class="pm-line"></div><div class="pm-val">Normal</div></div>
+    </div>
+    <div class="phone-mock">
+      <div class="phone-mock-label">💊 Medicamentos</div>
+      <div class="pm-row"><div class="pm-dot" style="background:#66BB6A;"></div><div class="pm-line"></div><div class="pm-val">✓ 08h</div></div>
+      <div class="pm-row"><div class="pm-dot" style="background:#FFA726;"></div><div class="pm-line"></div><div class="pm-val">⏰ 14h</div></div>
+      <div class="pm-row"><div class="pm-dot" style="background:#78909C;"></div><div class="pm-line"></div><div class="pm-val">○ 20h</div></div>
+    </div>
+    <div class="phone-mock">
+      <div class="phone-mock-label">💰 Finanças</div>
+      <div class="pm-row"><div class="pm-dot" style="background:#66BB6A;"></div><div class="pm-line"></div><div class="pm-val">João ✓</div></div>
+      <div class="pm-row"><div class="pm-dot" style="background:#66BB6A;"></div><div class="pm-line"></div><div class="pm-val">Maria ✓</div></div>
+      <div class="pm-row"><div class="pm-dot" style="background:#FFA726;"></div><div class="pm-line"></div><div class="pm-val">Pedro ⏳</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DOR -->
+<section class="dor">
+  <div class="container">
+    <div class="section-tag">😔 Você já passou por isso?</div>
+    <h2>Cuidar de um familiar idoso<br>sem organização é esgotante</h2>
+    <div class="dor-grid">
+      <div class="dor-card">
+        <div class="dor-icon">😰</div>
+        <div>
+          <h3>Remédio dado ou não?</h3>
+          <p>Ninguém sabe ao certo se a medicação foi administrada. Cada filho pergunta o mesmo e ninguém tem certeza.</p>
+        </div>
+      </div>
+      <div class="dor-card">
+        <div class="dor-icon">💸</div>
+        <div>
+          <h3>Quem pagou o quê?</h3>
+          <p>As despesas do idoso causam conflito na família. Falta transparência sobre quem contribuiu e quanto.</p>
+        </div>
+      </div>
+      <div class="dor-card">
+        <div class="dor-icon">📋</div>
+        <div>
+          <h3>Consultas e exames perdidos</h3>
+          <p>Laudos em papel, receitas espalhadas, histórico de consultas que ninguém consegue encontrar na hora certa.</p>
+        </div>
+      </div>
+      <div class="dor-card">
+        <div class="dor-icon">📞</div>
+        <div>
+          <h3>Comunicação desorganizada</h3>
+          <p>As informações ficam em grupos de WhatsApp bagunçados. Filhos que moram longe ficam sem saber o que está acontecendo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUÇÃO -->
+<section class="solucao">
+  <div class="container" style="text-align:center;">
+    <div class="section-tag azul">✅ A solução</div>
+    <h2>Tudo que sua família precisa,<br>em um único aplicativo</h2>
+    <p class="lead">O CuidarJuntos foi criado especialmente para famílias que cuidam de idosos — simples de usar, acessível no celular e conectado para todos da família em tempo real.</p>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">❤️</div>
+        <h3>Sinais Vitais</h3>
+        <p>Registre pressão, glicose, temperatura e mais. Alertas automáticos para valores fora do normal.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💊</div>
+        <h3>Medicamentos</h3>
+        <p>Cadastre todos os remédios com horários e confirme as administrações. Nunca mais erre a dose.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏥</div>
+        <h3>Consultas e Exames</h3>
+        <p>Registre visitas médicas, especialidades e guarde laudos digitalmente. Histórico completo sempre à mão.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💰</div>
+        <h3>Controle Financeiro</h3>
+        <p>Despesas, contribuições de cada filho e comprovantes em um só lugar. Transparência total para a família.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌙</div>
+        <h3>Cuidados Diários</h3>
+        <p>Registre banho, alimentação, fisioterapia e rotina do dia. Todos da família acompanham em tempo real.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔔</div>
+        <h3>Notificações</h3>
+        <p>Alertas de medicamentos, sinais alterados e novos registros enviados para toda a família.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="como">
+  <div class="container">
+    <div class="section-tag verde" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);">🚀 Simples assim</div>
+    <h2>Em 3 passos você já está usando</h2>
+    <p class="lead">Sem instalação complicada, sem precisar de técnico. Funciona direto no celular — iPhone ou Android.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Entre em contato</h3>
+        <p>Fale comigo pelo WhatsApp e receba tudo configurado para sua família</p>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Instale no celular</h3>
+        <p>Salve o app na tela inicial com um toque — igual a qualquer aplicativo</p>
+      </div>
+      <div class="step-arrow">›</div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Toda família conectada</h3>
+        <p>Cada filho tem seu acesso e vê tudo em tempo real, de qualquer lugar</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROVA SOCIAL -->
+<section class="prova">
+  <div class="container">
+    <div class="section-tag">💬 O que as famílias dizem</div>
+    <h2>Quem usa, não abre mão</h2>
+    <div class="prova-grid">
+      <div class="prova-card">
+        <div class="stars">★★★★★</div>
+        <p>"Antes ficávamos brigando sobre quem havia dado o remédio. Hoje abrimos o app e está tudo lá, registrado com hora e quem fez. Acabou o estresse."</p>
+        <div class="prova-autor">
+          <div class="prova-avatar">👩</div>
+          <div>
+            <div class="prova-nome">Ana Paula M.</div>
+            <div class="prova-desc">Filha cuidadora · BH/MG</div>
+          </div>
+        </div>
+      </div>
+      <div class="prova-card">
+        <div class="stars">★★★★★</div>
+        <p>"Moro em São Paulo e minha mãe está em BH. Com o CuidarJuntos acompanho tudo em tempo real. A pressão dela, os remédios, tudo. Me sinto presente mesmo de longe."</p>
+        <div class="prova-autor">
+          <div class="prova-avatar">👨</div>
+          <div>
+            <div class="prova-nome">Roberto S.</div>
+            <div class="prova-desc">Filho · São Paulo/SP</div>
+          </div>
+        </div>
+      </div>
+      <div class="prova-card">
+        <div class="stars">★★★★★</div>
+        <p>"O controle financeiro acabou com os desentendimentos. Agora todos veem quem pagou e quanto. A família toda ficou mais unida por causa disso."</p>
+        <div class="prova-autor">
+          <div class="prova-avatar">👩</div>
+          <div>
+            <div class="prova-nome">Carla F.</div>
+            <div class="prova-desc">Filha cuidadora · Contagem/MG</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREÇO -->
+<section class="preco">
+  <div class="container">
+    <div class="section-tag azul">💳 Investimento</div>
+    <h2>Quanto custa cuidar com tranquilidade?</h2>
+    <p class="lead">Menos do que uma consulta médica particular. E com muito mais paz de espírito para toda a família.</p>
+    <div class="planos">
+      <div class="plano">
+        <div class="plano-icon">⚡</div>
+        <h3>Ativação</h3>
+        <div class="plano-sub">Taxa única de configuração</div>
+        <div class="plano-preco">R$&nbsp;197<span><br>uma vez</span></div>
+        <hr class="plano-divider"/>
+        <ul>
+          <li>Configuração completa do sistema</li>
+          <li>Planilha e banco de dados criados</li>
+          <li>Cadastro de todos os usuários</li>
+          <li>Entrega pronto para usar</li>
+          <li>Suporte no primeiro acesso</li>
+        </ul>
+        <a class="btn-plano outline" href="https://wa.me/5531997035583?text=Quero+ativar+o+CuidarJuntos" target="_blank">Contratar Ativação</a>
+      </div>
+      <div class="plano destaque">
+        <div class="plano-badge">⭐ Recomendado</div>
+        <div class="plano-icon">💙</div>
+        <h3>Plano Família</h3>
+        <div class="plano-sub">Acesso + suporte mensal</div>
+        <div class="plano-preco">R$&nbsp;79<span>/mês</span><small>+ R$197 de ativação</small></div>
+        <hr class="plano-divider"/>
+        <ul>
+          <li>Acesso completo ao app</li>
+          <li>Usuários ilimitados da família</li>
+          <li>Suporte via WhatsApp</li>
+          <li>Atualizações incluídas</li>
+          <li>Backup dos dados na nuvem</li>
+          <li>Sem fidelidade — cancele quando quiser</li>
+        </ul>
+        <a class="btn-plano" href="https://wa.me/5531997035583?text=Quero+o+Plano+Família+CuidarJuntos" target="_blank">📲 Começar Agora</a>
+      </div>
+    </div>
+    <p class="preco-nota">🔒 Pagamento seguro · Sem contrato de fidelidade · Cancele quando quiser</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="container" style="text-align:center;">
+    <div class="section-tag azul">❓ Dúvidas frequentes</div>
+    <h2>Ficou alguma dúvida?</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Precisa instalar na loja de apps? <span class="faq-icon">+</span></button>
+        <div class="faq-a" style="display:none;">Não! O CuidarJuntos é um aplicativo web (PWA). Basta abrir o link no navegador e salvar na tela inicial do celular com um toque. Funciona em iPhone e Android, sem precisar de App Store nem Google Play.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Quantas pessoas da família podem usar? <span class="faq-icon">+</span></button>
+        <div class="faq-a" style="display:none;">Não há limite de usuários! Todos os filhos, genros, noras, cuidadores e qualquer pessoa da família pode ter seu próprio acesso com login individual.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Os dados ficam seguros? <span class="faq-icon">+</span></button>
+        <div class="faq-a" style="display:none;">Sim! Todos os dados são armazenados no Google Sheets, na conta da própria família. Você tem controle total sobre suas informações, que ficam protegidas pela segurança do Google.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Funciona sem internet? <span class="faq-icon">+</span></button>
+        <div class="faq-a" style="display:none;">O app funciona para visualização mesmo offline. Para salvar novos registros é necessário conexão com a internet, mas qualquer Wi-Fi básico ou dados móveis já são suficientes.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Como funciona o suporte? <span class="faq-icon">+</span></button>
+        <div class="faq-a" style="display:none;">O suporte é feito diretamente pelo WhatsApp. Você fala comigo, Renata, que fico à disposição para tirar dúvidas, resolver qualquer problema e garantir que o app funcione perfeitamente para sua família.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Posso cancelar a assinatura? <span class="faq-icon">+</span></button>
+        <div class="faq-a" style="display:none;">Sim, sem multa e sem burocracia. Basta me avisar pelo WhatsApp e a assinatura é cancelada no mês seguinte. Não há fidelidade mínima.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+  <div class="container">
+    <h2>Sua família merece cuidar<br>com mais paz e organização 💙</h2>
+    <p>Entre em contato agora e receba o CuidarJuntos configurado e pronto para usar em até 24 horas.</p>
+    <a class="btn-wpp" href="https://wa.me/5531997035583?text=Olá+Renata!+Quero+conhecer+o+CuidarJuntos" target="_blank">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Falar com Renata no WhatsApp
+    </a>
+    <p class="cta-sub">Resposta em até 1 hora · Seg a Sáb · (31) 99703-5583</p>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 CuidarJuntos · RSO Soluções em Vendas LTDA · Renata Silva · <a href="https://wa.me/5531997035583">WhatsApp</a></p>
+</footer>
+
+<script>
+function toggleFaq(btn){
+  const a=btn.nextElementSibling;
+  const icon=btn.querySelector('.faq-icon');
+  const open=a.style.display==='block';
+  a.style.display=open?'none':'block';
+  icon.textContent=open?'+':'−';
+}
+</script>
+</body>
+</html>

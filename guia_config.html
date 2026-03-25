@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Guia de Configuração — CuidarJuntos</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+@media print{
+  .no-print{display:none!important;}
+  body{background:#fff!important;color:#000!important;}
+  .page{box-shadow:none!important;margin:0!important;border-radius:0!important;}
+  section{page-break-inside:avoid;}
+}
+body{background:#E8EEF6;font-family:'Segoe UI',Arial,sans-serif;padding:20px;color:#1A2A3A;}
+.no-print{text-align:center;margin-bottom:20px;}
+.btn-print{background:#0D47A1;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-print:hover{background:#1565C0;}
+.page{background:#fff;max-width:800px;margin:0 auto;padding:48px 52px;box-shadow:0 4px 24px rgba(0,0,0,.12);border-radius:8px;}
+
+/* HEADER */
+.doc-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:24px;border-bottom:3px solid #0D47A1;margin-bottom:32px;}
+.doc-logo{display:flex;align-items:center;gap:12px;}
+.doc-logo-text h1{font-size:22px;font-weight:900;color:#0D47A1;}
+.doc-logo-text p{font-size:11px;color:#78909C;}
+.doc-meta{text-align:right;font-size:11px;color:#90A4AE;line-height:1.8;}
+
+/* INTRO */
+.intro{background:#E3F2FD;border-radius:10px;padding:18px 20px;margin-bottom:32px;border-left:4px solid #1E88E5;}
+.intro p{font-size:13px;color:#1A2A3A;line-height:1.7;}
+
+/* STEP */
+.step-section{margin-bottom:32px;}
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.step-num{width:32px;height:32px;border-radius:50%;background:#0D47A1;color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-header h2{font-size:16px;font-weight:800;color:#0D47A1;}
+.step-body{margin-left:44px;}
+.step-body p{font-size:13px;color:#37474F;line-height:1.8;margin-bottom:10px;}
+.step-body ol, .step-body ul{margin-left:18px;margin-bottom:10px;}
+.step-body li{font-size:13px;color:#37474F;line-height:1.9;}
+.step-body strong{color:#1A2A3A;}
+
+/* INFO BOX */
+.info-box{background:#F8FBFF;border:1px solid #BBDEFB;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:12px;color:#37474F;line-height:1.7;}
+.info-box.aviso{background:#FFF8E1;border-color:#FFE082;color:#5D4037;}
+.info-box strong{display:block;margin-bottom:4px;font-size:12px;}
+
+/* CAMPO */
+.campo{background:#F5F7FA;border:1px solid #E0E7EF;border-radius:6px;padding:8px 12px;font-family:monospace;font-size:12px;color:#1565C0;margin:6px 0;word-break:break-all;}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid #E0E7EF;margin:28px 0;}
+
+/* FOOTER */
+.doc-footer{margin-top:36px;padding-top:20px;border-top:2px solid #E0E7EF;display:flex;justify-content:space-between;align-items:center;}
+.doc-footer p{font-size:11px;color:#90A4AE;}
+.doc-footer strong{color:#0D47A1;}
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="doc-logo">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:44px;height:44px;">
+        <defs><linearGradient id="gh" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1E88E5"/><stop offset="100%" stop-color="#0D3B8E"/></linearGradient></defs>
+        <path d="M50,83 C27,67 9,52 9,34 C9,20 20,11 33,11 C40,11 46,14 50,19 C54,14 60,11 67,11 C80,11 91,20 91,34 C91,52 73,67 50,83Z" fill="url(#gh)"/>
+        <polyline points="15,62 22,62 28,42 34,72 41,51 47,51 53,62 59,62 65,30 71,62 77,18 86,18" stroke="#EF5350" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="doc-logo-text">
+        <h1>CuidarJuntos</h1>
+        <p>Saúde e Finanças da Família</p>
+      </div>
+    </div>
+    <div class="doc-meta">
+      <div><strong>Guia de Configuração</strong></div>
+      <div>Versão 1.0 · 2026</div>
+      <div>RSO Soluções · Renata Silva</div>
+      <div>(31) 99703-5583</div>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="intro">
+    <p><strong>Bem-vindo(a) ao CuidarJuntos!</strong> Este guia contém tudo que você precisa para configurar e começar a usar o aplicativo. Siga os passos na ordem e, em caso de dúvida, entre em contato com a Renata pelo WhatsApp.</p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <h2>Instalar o Aplicativo no Celular</h2>
+    </div>
+    <div class="step-body">
+      <p>O CuidarJuntos funciona direto no navegador do celular — não precisa ir à loja de aplicativos. Para instalar:</p>
+      <p><strong>📱 No Android (Google Chrome):</strong></p>
+      <ol>
+        <li>Abra o link abaixo no Chrome</li>
+        <li>Toque no botão <strong>"📲 Salvar na Tela Inicial"</strong> que aparece na tela de boas-vindas</li>
+        <li>Confirme tocando em <strong>"Instalar"</strong></li>
+        <li>O ícone do CuidarJuntos aparecerá na tela inicial do celular</li>
+      </ol>
+      <p><strong>🍎 No iPhone (Safari):</strong></p>
+      <ol>
+        <li>Abra o link no Safari (não em outro navegador)</li>
+        <li>Toque no ícone de compartilhar <strong>⬆️</strong> na barra inferior</li>
+        <li>Role e toque em <strong>"Adicionar à Tela de Início"</strong></li>
+        <li>Confirme tocando em <strong>"Adicionar"</strong></li>
+      </ol>
+      <div class="campo">https://cuidarjuntosoficialapp-stack.github.io/-CuidarJuntos/</div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- STEP 2 -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <h2>Fazer o Primeiro Login</h2>
+    </div>
+    <div class="step-body">
+      <p>Após instalar e abrir o app, você verá a tela de boas-vindas. Toque em <strong>"Entrar"</strong> e use os dados abaixo:</p>
+      <div class="info-box">
+        <strong>📋 Seus dados de acesso:</strong>
+        Usuário: ___________________________________<br>
+        Senha temporária: __________________________
+      </div>
+      <div class="info-box aviso">
+        <strong>⚠️ Importante:</strong>
+        Após o primeiro login, vá em ⚙️ Configurações → Trocar Senha e crie uma senha pessoal. Anote em um lugar seguro.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- STEP 3 -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <h2>Configurar a URL do Sistema</h2>
+    </div>
+    <div class="step-body">
+      <p>Este passo conecta o app ao banco de dados da sua família. Só precisa ser feito uma única vez.</p>
+      <ol>
+        <li>No app, toque no menu <strong>☰</strong> no canto superior esquerdo</li>
+        <li>Toque em <strong>⚙️ Configurações</strong></li>
+        <li>Encontre o campo <strong>"URL do Sistema"</strong></li>
+        <li>Cole o link abaixo neste campo:</li>
+      </ol>
+      <div class="campo">https://script.google.com/macros/s/AKfycbz83Jtp7N_tOELrdUIFXytKbJu8Te8x5zdKHQo5-xMP3RiRAQm21NKQLSP58ipSyJbP/exec</div>
+      <ol start="5">
+        <li>Toque em <strong>"Salvar"</strong></li>
+        <li>O app mostrará uma mensagem de confirmação</li>
+      </ol>
+      <div class="info-box">
+        <strong>💡 Dica:</strong>
+        Copie e cole o link — não tente digitar manualmente para evitar erros.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- STEP 4 -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <h2>Acessar a Planilha de Dados</h2>
+    </div>
+    <div class="step-body">
+      <p>A planilha é o banco de dados da família. Você pode acessá-la a qualquer momento para visualizar, exportar ou conferir os registros.</p>
+      <div class="campo">https://docs.google.com/spreadsheets/d/11jRCxJvKluR2af9HXDVv4eUXtDrDpI0Ee_dpfY_znl8/edit</div>
+      <div class="info-box aviso">
+        <strong>⚠️ Atenção:</strong>
+        Não edite a planilha manualmente — use sempre o app para registrar informações. Edições diretas podem causar erros.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- STEP 5 -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <h2>Principais Funcionalidades</h2>
+    </div>
+    <div class="step-body">
+      <p>Após configurar, explore o app pelas abas na parte inferior da tela:</p>
+      <ul>
+        <li><strong>🏠 Início</strong> — Resumo geral da situação do familiar</li>
+        <li><strong>❤️ Saúde</strong> — Sinais vitais, medicamentos e consultas</li>
+        <li><strong>🌙 Cuidados</strong> — Registro diário de banho, alimentação e rotina</li>
+        <li><strong>💰 Financeiro</strong> — Despesas e contribuições de cada filho</li>
+        <li><strong>🔔 Notificações</strong> — Alertas e avisos para a família</li>
+      </ul>
+      <div class="info-box">
+        <strong>💡 Dica de uso:</strong>
+        Registre os medicamentos logo cedo e confirme as administrações ao longo do dia. Toda a família receberá notificação quando algo for registrado.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- STEP 6 -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <h2>Suporte e Contato</h2>
+    </div>
+    <div class="step-body">
+      <p>Qualquer dúvida, problema ou sugestão — fale diretamente com a Renata:</p>
+      <div class="info-box">
+        <strong>📞 Contato de suporte:</strong>
+        WhatsApp: (31) 99703-5583<br>
+        Atendimento: Segunda a Sábado<br>
+        Horário: 8h às 18h<br>
+        Resposta em até 1 hora no horário comercial
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <p>© 2026 <strong>CuidarJuntos</strong> · RSO Soluções em Vendas LTDA</p>
+    <p>Suporte: <strong>(31) 99703-5583</strong></p>
+  </div>
+
+</div>
+</body>
+</html>

@@ -886,6 +886,17 @@ select.inp{cursor:pointer;}
     </div>
 
     <button class="btn-entrar" onclick="fazerLogin()">Entrar →</button>
+
+    <!-- BOTÃO DEMO -->
+    <button onclick="entrarDemo()" style="
+      width:100%;margin-top:10px;padding:13px;
+      background:transparent;border:1.5px solid rgba(21,101,192,.3);
+      border-radius:var(--radius);color:var(--blue);
+      font-size:14px;font-weight:600;cursor:pointer;
+      font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;
+      transition:all .2s;">
+      👀 Ver Demonstração Gratuita
+    </button>
   </div>
 
   <!-- INFO CARDS -->
@@ -1027,6 +1038,16 @@ select.inp{cursor:pointer;}
 </div>
 
 <!-- BANNER SENHA TEMPORÁRIA -->
+<!-- BANNER MODO DEMO -->
+<div id="bannerDemo" style="display:none;background:#1565C0;border-bottom:2px solid #0D47A1;padding:10px 16px;align-items:center;gap:10px;">
+  <span style="font-size:18px;">👀</span>
+  <div style="flex:1;">
+    <div style="font-size:12px;font-weight:700;color:#fff;">Você está no Modo Demonstração</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.75);">Os dados são fictícios · Para usar de verdade, adquira o app</div>
+  </div>
+  <button onclick="sairDemo()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">Sair</button>
+</div>
+
 <div id="bannerSenhaPadrao" style="display:none;background:#FFF3E0;border-bottom:2px solid #FFB74D;padding:10px 16px;display:none;align-items:center;gap:10px;cursor:pointer;" onclick="abrirModalSenha()">
   <span style="font-size:18px;">🔑</span>
   <div style="flex:1;">
@@ -3189,7 +3210,75 @@ function fazerLogin(){
     ls.classList.add('oculta');
     document.getElementById('APP').style.display='flex';
     iniciarApp();
+    // Tutorial no primeiro acesso real
+    if(!localStorage.getItem('cj_tutorial_visto')){
+      setTimeout(()=>mostrarTutorial(),800);
+    }
   }, 300);
+}
+
+// ─── Modo Demonstração ───
+var _modoDemo = false;
+var DEMO_USER = {nome:'Ana Silva',role:'filho',ico:'👩'};
+var DEMO_DADOS = {
+  vitais:[
+    {sinal:'Pressão Arterial',valor:'128/82 mmHg',status:'normal',quando:'Hoje, 08:15'},
+    {sinal:'Glicemia',valor:'112 mg/dL',status:'normal',quando:'Hoje, 07:30'},
+    {sinal:'Temperatura',valor:'36.8°C',status:'normal',quando:'Hoje, 09:00'},
+    {sinal:'Saturação O₂',valor:'97%',status:'normal',quando:'Hoje, 09:00'},
+  ],
+  medicamentos:[
+    {nome:'Losartana 50mg',horario:'07:00',dado:true},
+    {nome:'Metformina 850mg',horario:'12:00',dado:false},
+    {nome:'AAS 100mg',horario:'20:00',dado:false},
+  ],
+  despesas:[
+    {desc:'Farmácia — remédios',valor:187.50,data:'15/03'},
+    {desc:'Fisioterapia',valor:250.00,data:'12/03'},
+    {desc:'Consulta cardiologista',valor:320.00,data:'08/03'},
+  ],
+  contribuicoes:[
+    {nome:'Ana Silva',valor:500,status:'pago'},
+    {nome:'Carlos Silva',valor:500,status:'pago'},
+    {nome:'Marcos Silva',valor:500,status:'pendente'},
+  ]
+};
+
+function entrarDemo(){
+  _modoDemo = true;
+  U = DEMO_USER;
+  const ls = document.getElementById('loginScreen');
+  ls.style.opacity='0';ls.style.transition='opacity .3s';
+  setTimeout(()=>{
+    ls.classList.add('oculta');
+    document.getElementById('APP').style.display='flex';
+    document.getElementById('bannerDemo').style.display='flex';
+    iniciarApp();
+    carregarDadosDemo();
+  },300);
+}
+
+function sairDemo(){
+  _modoDemo = false;
+  U = null;
+  document.getElementById('bannerDemo').style.display='none';
+  document.getElementById('APP').style.display='none';
+  mostrarLogin();
+}
+
+function carregarDadosDemo(){
+  // Saudação
+  const h=new Date().getHours();
+  const saud=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
+  const gr=document.getElementById('dashGreeting');
+  if(gr) gr.textContent=saud+', Ana 👋';
+  // Nome paciente
+  const pn=document.getElementById('drPacNome');
+  if(pn) pn.textContent='José do Carmo';
+  // Mostrar tutorial se primeira vez
+  if(!localStorage.getItem('cj_tutorial_visto')){
+    setTimeout(()=>mostrarTutorial(),600);
+  }
 }
 
 // ─── Mostrar login novamente ───
@@ -4826,6 +4915,83 @@ function fecharBannerIOS(){
   </div>
   <button class="ib-btn" onclick="instalarApp()">Instalar</button>
 </div>
+
+<!-- ════════════════════════════════════════
+     TUTORIAL INTERATIVO DE PRIMEIRO ACESSO
+════════════════════════════════════════ -->
+<div id="tutorialOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center;">
+  <div id="tutorialBox" style="background:#fff;border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:430px;position:relative;animation:slideUp .35s ease;">
+    <!-- Barra de progresso -->
+    <div style="display:flex;gap:6px;margin-bottom:20px;">
+      <div id="tp0" style="flex:1;height:4px;border-radius:2px;background:#1565C0;transition:background .3s;"></div>
+      <div id="tp1" style="flex:1;height:4px;border-radius:2px;background:#E0EAF6;transition:background .3s;"></div>
+      <div id="tp2" style="flex:1;height:4px;border-radius:2px;background:#E0EAF6;transition:background .3s;"></div>
+      <div id="tp3" style="flex:1;height:4px;border-radius:2px;background:#E0EAF6;transition:background .3s;"></div>
+      <div id="tp4" style="flex:1;height:4px;border-radius:2px;background:#E0EAF6;transition:background .3s;"></div>
+    </div>
+    <!-- Conteúdo do passo -->
+    <div style="text-align:center;min-height:200px;">
+      <div id="tutIco" style="font-size:64px;margin-bottom:16px;"></div>
+      <div id="tutTit" style="font-size:20px;font-weight:800;color:#0D1B2A;margin-bottom:10px;"></div>
+      <div id="tutMsg" style="font-size:14px;color:#546E7A;line-height:1.7;max-width:320px;margin:0 auto;"></div>
+    </div>
+    <!-- Botões -->
+    <div style="display:flex;gap:10px;margin-top:24px;">
+      <button id="tutBtnPular" onclick="fecharTutorial()" style="flex:1;padding:13px;background:transparent;border:1.5px solid #E0EAF6;border-radius:12px;color:#90A4AE;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Pular</button>
+      <button id="tutBtnNext" onclick="tutorialProximo()" style="flex:2;padding:13px;background:linear-gradient(135deg,#1565C0,#1E88E5);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Próximo →</button>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+</style>
+
+<script>
+var _tutPasso = 0;
+var _tutPassos = [
+  {ico:'💙',tit:'Bem-vindo ao CuidarJuntos!',msg:'Este aplicativo foi feito para organizar a saúde e as finanças do seu familiar. Vamos fazer um tour rápido pelos módulos principais.'},
+  {ico:'❤️',tit:'Saúde — Sinais Vitais',msg:'Na aba Saúde você registra pressão, glicose, temperatura e mais. O app alerta automaticamente quando algum valor estiver fora do normal.'},
+  {ico:'💊',tit:'Medicamentos',msg:'Cadastre todos os remédios com horários e confirme cada administração. Toda a família vê em tempo real o que foi dado e o que ainda falta.'},
+  {ico:'💰',tit:'Financeiro',msg:'Registre despesas, comprovantes e contribuições de cada filho. Transparência total para evitar conflitos — todos veem o mesmo histórico.'},
+  {ico:'✅',tit:'Tudo pronto!',msg:'Agora é só começar a registrar. Qualquer dúvida, fale com a Renata pelo WhatsApp: (31) 99703-5583. Bom uso! 😊'},
+];
+
+function mostrarTutorial(){
+  _tutPasso = 0;
+  atualizarTutorial();
+  document.getElementById('tutorialOverlay').style.display='flex';
+}
+
+function atualizarTutorial(){
+  var p = _tutPassos[_tutPasso];
+  document.getElementById('tutIco').textContent = p.ico;
+  document.getElementById('tutTit').textContent = p.tit;
+  document.getElementById('tutMsg').textContent = p.msg;
+  // Progresso
+  for(var i=0;i<5;i++){
+    document.getElementById('tp'+i).style.background = i<=_tutPasso ? '#1565C0' : '#E0EAF6';
+  }
+  // Último passo
+  var isUltimo = _tutPasso === _tutPassos.length - 1;
+  document.getElementById('tutBtnNext').textContent = isUltimo ? '✓ Começar' : 'Próximo →';
+  document.getElementById('tutBtnPular').style.display = isUltimo ? 'none' : 'block';
+}
+
+function tutorialProximo(){
+  if(_tutPasso < _tutPassos.length - 1){
+    _tutPasso++;
+    atualizarTutorial();
+  } else {
+    fecharTutorial();
+  }
+}
+
+function fecharTutorial(){
+  document.getElementById('tutorialOverlay').style.display='none';
+  localStorage.setItem('cj_tutorial_visto','1');
+}
+</script>
 
 <!-- BANNER iOS -->
 <div id="iosBanner">

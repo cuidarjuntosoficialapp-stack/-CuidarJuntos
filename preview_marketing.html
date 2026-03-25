@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Marketing Instagram — CuidarJuntos</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#060E1C;font-family:system-ui,Arial,sans-serif;padding:28px 12px 60px;}
+h1{color:#fff;font-size:17px;font-weight:700;text-align:center;margin-bottom:4px;}
+.sub{color:rgba(255,255,255,.4);font-size:11px;text-align:center;margin-bottom:10px;}
+.tabs{display:flex;justify-content:center;gap:8px;margin-bottom:30px;}
+.tab{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:7px 20px;font-size:12px;font-weight:700;color:rgba(255,255,255,.5);cursor:pointer;}
+.tab.active{background:#1565C0;border-color:#1565C0;color:#fff;}
+.panel{display:none;}
+.panel.active{display:block;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:1200px;margin:0 auto;}
+.card{background:#0E1A2E;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;}
+.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.tag{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;}
+.tag-name{font-size:12px;font-weight:700;color:#90CAF9;}
+canvas{width:100%;border-radius:8px;display:block;}
+.btn{width:100%;margin-top:10px;background:linear-gradient(135deg,#1565C0,#1E88E5);color:#fff;border:none;border-radius:8px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn:hover{opacity:.85;}
+.caption-box{background:#0A1220;border-radius:8px;padding:12px;margin-top:8px;}
+.caption-box p{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;font-weight:600;}
+.caption{font-size:11px;color:rgba(255,255,255,.7);line-height:1.7;white-space:pre-wrap;}
+.btn-copy{width:100%;background:rgba(30,136,229,.15);border:1px solid rgba(30,136,229,.3);color:#90CAF9;border-radius:6px;padding:6px;font-size:10px;font-weight:700;cursor:pointer;margin-top:6px;font-family:inherit;}
+</style>
+</head>
+<body>
+
+<h1>📣 Imagens de Marketing — CuidarJuntos</h1>
+<p class="sub">Para Instagram e WhatsApp · Baixe e publique</p>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('posts')">📷 Posts (1080×1080)</div>
+  <div class="tab" onclick="showTab('stories')">📱 Stories (1080×1920)</div>
+</div>
+
+<!-- POSTS -->
+<div class="panel active" id="panel-posts">
+<div class="grid">
+
+  <div class="card">
+    <div class="card-top"><span class="tag">Post 1</span><span class="tag-name">Problema / Dor</span></div>
+    <canvas id="p1" width="1080" height="1080"></canvas>
+    <button class="btn" onclick="baixar('p1','post1-dor.jpg')">⬇ Baixar Post 1</button>
+    <div class="caption-box">
+      <p>📝 Legenda sugerida:</p>
+      <div class="caption" id="cap1">Sua família já passou por isso? 😔
+
+Remédio dado ou não dado... ninguém tem certeza.
+Despesas que geram briga entre os filhos.
+Consultas perdidas porque o papel sumiu.
+
+Isso tem solução. 💙
+
+O CuidarJuntos organiza a saúde e as finanças do seu familiar idoso — tudo em um único app, acessível por toda a família em tempo real.
+
+👇 Link na bio para conhecer
+#CuidarJuntos #CuidadosComIdosos #FamíliaUnida #SaúdeDoIdoso</div>
+      <button class="btn-copy" onclick="copiarLegenda('cap1',this)">📋 Copiar Legenda</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><span class="tag">Post 2</span><span class="tag-name">Benefícios</span></div>
+    <canvas id="p2" width="1080" height="1080"></canvas>
+    <button class="btn" onclick="baixar('p2','post2-beneficios.jpg')">⬇ Baixar Post 2</button>
+    <div class="caption-box">
+      <p>📝 Legenda sugerida:</p>
+      <div class="caption" id="cap2">Tudo que sua família precisa, em um único lugar 💙
+
+✅ Medicamentos com confirmação por horário
+✅ Sinais vitais com alertas automáticos
+✅ Histórico completo de consultas e exames
+✅ Controle financeiro transparente
+✅ Todos da família conectados em tempo real
+
+O CuidarJuntos foi feito para quem cuida com amor e quer cuidar com organização também.
+
+Clique no link da bio e saiba mais 👆
+#CuidarJuntos #AppFamília #CuidadoComCarinho #IdosoSaudável</div>
+      <button class="btn-copy" onclick="copiarLegenda('cap2',this)">📋 Copiar Legenda</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><span class="tag">Post 3</span><span class="tag-name">Preço / Oferta</span></div>
+    <canvas id="p3" width="1080" height="1080"></canvas>
+    <button class="btn" onclick="baixar('p3','post3-preco.jpg')">⬇ Baixar Post 3</button>
+    <div class="caption-box">
+      <p>📝 Legenda sugerida:</p>
+      <div class="caption" id="cap3">Quanto vale cuidar com tranquilidade? 💙
+
+O CuidarJuntos custa menos do que uma consulta médica particular por mês — e resolve problemas que uma consulta não resolve:
+
+❌ Remédio esquecido
+❌ Brigas sobre quem pagou o quê
+❌ Exames perdidos
+❌ Filhos sem informação
+
+Por apenas R$79/mês sua família tem tudo organizado.
+
+Fale comigo no WhatsApp 👇
+(31) 99703-5583
+#CuidarJuntos #SoluçãoParaFamília #CuidadoOrganizado</div>
+      <button class="btn-copy" onclick="copiarLegenda('cap3',this)">📋 Copiar Legenda</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><span class="tag">Post 4</span><span class="tag-name">Como Funciona</span></div>
+    <canvas id="p4" width="1080" height="1080"></canvas>
+    <button class="btn" onclick="baixar('p4','post4-comofunciona.jpg')">⬇ Baixar Post 4</button>
+    <div class="caption-box">
+      <p>📝 Legenda sugerida:</p>
+      <div class="caption" id="cap4">É mais simples do que você imagina 😊
+
+Em 3 passos sua família já está usando o CuidarJuntos:
+
+1️⃣ Você fala comigo — eu configuro tudo em até 24h
+2️⃣ Cada filho recebe seu login e instala no celular
+3️⃣ Toda a família já está conectada e organizada
+
+Sem precisar de técnico. Sem ir em loja de app.
+Funciona em qualquer celular — iPhone ou Android.
+
+Me chame no WhatsApp 👇
+(31) 99703-5583
+#CuidarJuntos #AppSimples #TecnologiaParaFamília</div>
+      <button class="btn-copy" onclick="copiarLegenda('cap4',this)">📋 Copiar Legenda</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><span class="tag">Post 5</span><span class="tag-name">Urgência / CTA</span></div>
+    <canvas id="p5" width="1080" height="1080"></canvas>
+    <button class="btn" onclick="baixar('p5','post5-cta.jpg')">⬇ Baixar Post 5</button>
+    <div class="caption-box">
+      <p>📝 Legenda sugerida:</p>
+      <div class="caption" id="cap5">Para quem cuida de um familiar idoso 💙
+
+Você não precisa fazer isso sozinho(a).
+
+O CuidarJuntos conecta toda a família — cada um faz sua parte, todos sabem o que está acontecendo.
+
+Hoje mesmo você pode começar.
+
+👉 Me chame no WhatsApp agora:
+(31) 99703-5583
+
+Ou acesse a demonstração gratuita:
+cuidarjuntosoficialapp-stack.github.io/-CuidarJuntos/
+
+#CuidarJuntos #CuidadoEmFamília #IdosoComCarinho #OrganizaçãoFamiliar</div>
+      <button class="btn-copy" onclick="copiarLegenda('cap5',this)">📋 Copiar Legenda</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- STORIES -->
+<div class="panel" id="panel-stories">
+<div class="grid">
+
+  <div class="card">
+    <div class="card-top"><span class="tag">Story 1</span><span class="tag-name">Dor + Solução</span></div>
+    <canvas id="s1" width="1080" height="1920"></canvas>
+    <button class="btn" onclick="baixar('s1','story1.jpg')">⬇ Baixar Story 1</button>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><span class="tag">Story 2</span><span class="tag-name">Funcionalidades</span></div>
+    <canvas id="s2" width="1080" height="1920"></canvas>
+    <button class="btn" onclick="baixar('s2','story2.jpg')">⬇ Baixar Story 2</button>
+  </div>
+
+  <div class="card">
+    <div class="card-top"><span class="tag">Story 3</span><span class="tag-name">Preço + CTA</span></div>
+    <canvas id="s3" width="1080" height="1920"></canvas>
+    <button class="btn" onclick="baixar('s3','story3.jpg')">⬇ Baixar Story 3</button>
+  </div>
+
+</div>
+</div>
+
+<script>
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+}
+function baixar(id,nome){
+  const cv=document.getElementById(id);
+  const a=document.createElement('a');
+  a.download=nome;a.href=cv.toDataURL('image/jpeg',.95);a.click();
+}
+function copiarLegenda(id,btn){
+  navigator.clipboard.writeText(document.getElementById(id).innerText).then(()=>{
+    btn.textContent='✅ Copiada!';setTimeout(()=>btn.textContent='📋 Copiar Legenda',2000);
+  });
+}
+
+// ─── HELPERS ───
+function rr(ctx,x,y,w,h,r,fill,stroke,lw){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||2;ctx.stroke();}
+}
+function wrap(ctx,txt,x,y,maxW,lh){
+  const words=txt.split(' ');let line='',lines=[];
+  words.forEach(w=>{const t=line+w+' ';if(ctx.measureText(t).width>maxW&&line){lines.push(line.trim());line=w+' ';}else line=t;});
+  if(line.trim())lines.push(line.trim());
+  lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lh));return lines.length;
+}
+function drawLogo(ctx,cx,cy,sz){
+  const s=sz/100;ctx.save();ctx.translate(cx-sz/2,cy-sz/2);
+  ctx.beginPath();ctx.moveTo(50*s,83*s);ctx.bezierCurveTo(27*s,67*s,9*s,52*s,9*s,34*s);ctx.bezierCurveTo(9*s,20*s,20*s,11*s,33*s,11*s);ctx.bezierCurveTo(40*s,11*s,46*s,14*s,50*s,19*s);ctx.bezierCurveTo(54*s,14*s,60*s,11*s,67*s,11*s);ctx.bezierCurveTo(80*s,11*s,91*s,20*s,91*s,34*s);ctx.bezierCurveTo(91*s,52*s,73*s,67*s,50*s,83*s);ctx.closePath();
+  const hg=ctx.createLinearGradient(0,0,100*s,100*s);hg.addColorStop(0,'#1E88E5');hg.addColorStop(1,'#0D3B8E');
+  ctx.fillStyle=hg;ctx.fill();
+  ctx.beginPath();ctx.moveTo(15*s,62*s);[22,28,34,41,47,53,59,65,71,77,86].forEach((x,i)=>{const ys=[62,42,72,51,51,62,62,30,62,18,18];ctx.lineTo(x*s,ys[i]*s);});
+  ctx.strokeStyle='#EF5350';ctx.lineWidth=3*s;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
+  ctx.restore();
+}
+
+// ─── POST 1: DOR ───
+(function(){
+  const cv=document.getElementById('p1'),ctx=cv.getContext('2d'),W=1080,H=1080;
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0A1E3D');bg.addColorStop(1,'#06101F');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(239,83,80,.06)';ctx.fillRect(0,0,W,H/2);
+  ctx.fillStyle='rgba(21,101,192,.06)';ctx.fillRect(0,H/2,W,H/2);
+  // Borda top
+  const bt=ctx.createLinearGradient(0,0,W,0);bt.addColorStop(0,'#EF5350');bt.addColorStop(1,'#1565C0');
+  ctx.fillStyle=bt;ctx.fillRect(0,0,W,8);
+  ctx.textAlign='center';
+  // Emoji
+  ctx.font='120px Arial';ctx.fillText('😔',W/2,200);
+  // Título
+  ctx.fillStyle='#fff';ctx.font='bold 72px Arial';
+  ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=16;
+  ctx.fillText('Sua família já',W/2,320);
+  ctx.fillStyle='#EF9A9A';ctx.fillText('passou por isso?',W/2,408);ctx.shadowBlur=0;
+  // Cards dor
+  const dores=[
+    {ico:'💊',txt:'Remédio dado ou não dado?'},
+    {ico:'💸',txt:'Quem pagou o quê?'},
+    {ico:'📋',txt:'Exame perdido no papel'},
+    {ico:'📞',txt:'Família sem comunicação'},
+  ];
+  dores.forEach((d,i)=>{
+    const x=W/2-420,y=470+i*120,w=840,h=96;
+    rr(ctx,x,y,w,h,18,'rgba(255,255,255,.05)','rgba(255,255,255,.1)');
+    ctx.fillStyle='#fff';ctx.font='44px Arial';ctx.textAlign='left';ctx.fillText(d.ico,x+24,y+62);
+    ctx.font='34px Arial';ctx.fillText(d.txt,x+90,y+62);
+    ctx.textAlign='center';
+  });
+  // Bottom
+  drawLogo(ctx,W/2,990,60);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='bold 26px Arial';ctx.fillText('CuidarJuntos · A solução está aqui 💙',W/2,1050);
+  ctx.textAlign='left';
+})();
+
+// ─── POST 2: BENEFÍCIOS ───
+(function(){
+  const cv=document.getElementById('p2'),ctx=cv.getContext('2d'),W=1080,H=1080;
+  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#0D2B5E');bg.addColorStop(1,'#061020');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // Halo
+  const hl=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,500);hl.addColorStop(0,'rgba(21,101,192,.2)');hl.addColorStop(1,'transparent');
+  ctx.fillStyle=hl;ctx.fillRect(0,0,W,H);
+  // Borda
+  ctx.fillStyle='#1565C0';ctx.fillRect(0,0,W,6);
+  ctx.textAlign='center';
+  // Logo + título
+  drawLogo(ctx,W/2,130,100);
+  ctx.fillStyle='#fff';ctx.font='bold 64px Arial';
+  ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=14;
+  ctx.fillText('Tudo em um',W/2,270);ctx.fillStyle='#64B5F6';ctx.fillText('único lugar 💙',W/2,345);ctx.shadowBlur=0;
+  // Features
+  const feats=[
+    {ico:'💊',tit:'Medicamentos',sub:'Com confirmação por horário'},
+    {ico:'❤️',tit:'Sinais Vitais',sub:'Alertas automáticos'},
+    {ico:'🏥',tit:'Consultas',sub:'Histórico completo'},
+    {ico:'💰',tit:'Financeiro',sub:'Transparência total'},
+    {ico:'🔔',tit:'Notificações',sub:'Para toda a família'},
+    {ico:'👨‍👩‍👧',tit:'Família Conectada',sub:'Em tempo real'},
+  ];
+  feats.forEach((f,i)=>{
+    const col=i%2,row=Math.floor(i/2);
+    const x=120+col*520,y=420+row*186,w=460,h=158;
+    rr(ctx,x,y,w,h,18,'rgba(255,255,255,.06)','rgba(255,255,255,.1)');
+    ctx.fillStyle='#fff';ctx.font='48px Arial';ctx.textAlign='left';ctx.fillText(f.ico,x+20,y+72);
+    ctx.font='bold 30px Arial';ctx.fillText(f.tit,x+88,y+60);
+    ctx.fillStyle='rgba(255,255,255,.55)';ctx.font='24px Arial';ctx.fillText(f.sub,x+88,y+98);
+    ctx.textAlign='center';
+  });
+  // Rodapé
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='22px Arial';
+  ctx.fillText('RSO Soluções · (31) 99703-5583',W/2,1050);
+  ctx.textAlign='left';
+})();
+
+// ─── POST 3: PREÇO ───
+(function(){
+  const cv=document.getElementById('p3'),ctx=cv.getContext('2d'),W=1080,H=1080;
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0A1E3D');bg.addColorStop(1,'#06101F');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // Destaque top
+  const bt=ctx.createLinearGradient(0,0,W,0);bt.addColorStop(0,'#1565C0');bt.addColorStop(.5,'#EF5350');bt.addColorStop(1,'#1565C0');
+  ctx.fillStyle=bt;ctx.fillRect(0,0,W,8);
+  ctx.textAlign='center';
+  // Tag
+  rr(ctx,W/2-160,40,320,50,25,'rgba(239,83,80,.15)','#EF5350');
+  ctx.fillStyle='#EF9A9A';ctx.font='bold 22px Arial';ctx.fillText('💳  INVESTIMENTO',W/2,72);
+  // Título
+  ctx.fillStyle='#fff';ctx.font='bold 68px Arial';
+  ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=14;
+  ctx.fillText('Quanto vale cuidar',W/2,180);ctx.fillStyle='#64B5F6';ctx.fillText('com tranquilidade?',W/2,256);ctx.shadowBlur=0;
+  // Card ativação
+  rr(ctx,120,310,840,190,24,'rgba(255,255,255,.05)','rgba(255,255,255,.1)');
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='24px Arial';ctx.fillText('⚡ Ativação — taxa única',W/2,358);
+  ctx.fillStyle='#fff';ctx.font='bold 96px Arial';ctx.fillText('R$ 197',W/2,460);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='22px Arial';ctx.fillText('Configuração completa · Entrega em 24h',W/2,495);
+  // Card mensalidade
+  rr(ctx,120,530,840,220,24,'rgba(21,101,192,.2)','#1565C0',2);
+  rr(ctx,W/2-80,516,160,30,15,'#1565C0');
+  ctx.fillStyle='#fff';ctx.font='bold 16px Arial';ctx.fillText('RECOMENDADO',W/2,535);
+  ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='24px Arial';ctx.fillText('💙 Plano Família — mensal',W/2,590);
+  ctx.fillStyle='#fff';ctx.font='bold 110px Arial';ctx.fillText('R$ 79',W/2,700);
+  ctx.fillStyle='#64B5F6';ctx.font='bold 28px Arial';ctx.fillText('/mês',W/2+180,660);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='22px Arial';ctx.fillText('Acesso · Suporte · Atualizações incluídas',W/2,742);
+  // Comparativo
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='italic 26px Arial';ctx.fillText('Menos do que uma consulta médica particular!',W/2,820);
+  // CTA
+  rr(ctx,200,856,680,90,45,'#25D366');
+  ctx.fillStyle='#fff';ctx.font='bold 34px Arial';ctx.fillText('📲  Fale comigo no WhatsApp',W/2,910);
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='22px Arial';ctx.fillText('(31) 99703-5583 · RSO Soluções',W/2,1000);
+  ctx.textAlign='left';
+})();
+
+// ─── POST 4: COMO FUNCIONA ───
+(function(){
+  const cv=document.getElementById('p4'),ctx=cv.getContext('2d'),W=1080,H=1080;
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#061020');bg.addColorStop(1,'#0A1E3D');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#1565C0';ctx.fillRect(0,0,W,6);
+  ctx.textAlign='center';
+  drawLogo(ctx,W/2,110,100);
+  ctx.fillStyle='#fff';ctx.font='bold 60px Arial';ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=12;
+  ctx.fillText('Simples assim 😊',W/2,256);ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='28px Arial';ctx.fillText('Em 3 passos sua família já está organizada',W/2,310);
+  // Steps
+  const steps=[
+    {n:'1',ico:'📞',tit:'Entre em contato',sub:'Fale comigo no WhatsApp'},
+    {n:'2',ico:'⚙️',tit:'Eu configuro tudo',sub:'Pronto em até 24 horas'},
+    {n:'3',ico:'✅',tit:'Família conectada',sub:'Todos usando e organizados'},
+  ];
+  steps.forEach((st,i)=>{
+    const y=380+i*210;
+    rr(ctx,120,y,840,182,20,'rgba(255,255,255,.05)','rgba(255,255,255,.1)');
+    // Número
+    ctx.fillStyle='#1565C0';ctx.beginPath();ctx.arc(200,y+91,42,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='bold 44px Arial';ctx.fillText(st.n,200,y+106);
+    // Emoji
+    ctx.font='56px Arial';ctx.textAlign='left';ctx.fillText(st.ico,290,y+105);
+    ctx.font='bold 36px Arial';ctx.fillStyle='#fff';ctx.fillText(st.tit,380,y+80);
+    ctx.font='26px Arial';ctx.fillStyle='rgba(255,255,255,.55)';ctx.fillText(st.sub,380,y+122);
+    ctx.textAlign='center';
+    if(i<2){ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='30px Arial';ctx.fillText('↓',W/2,y+210);}
+  });
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.font='22px Arial';ctx.fillText('RSO Soluções · Renata Silva · (31) 99703-5583',W/2,1054);
+  ctx.textAlign='left';
+})();
+
+// ─── POST 5: CTA ───
+(function(){
+  const cv=document.getElementById('p5'),ctx=cv.getContext('2d'),W=1080,H=1080;
+  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#0D47A1');bg.addColorStop(.6,'#0A1E3D');bg.addColorStop(1,'#06101F');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const hl=ctx.createRadialGradient(W/2,400,0,W/2,400,600);hl.addColorStop(0,'rgba(100,181,246,.15)');hl.addColorStop(1,'transparent');
+  ctx.fillStyle=hl;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#1565C0';ctx.fillRect(0,0,W,6);
+  ctx.textAlign='center';
+  ctx.font='160px Arial';ctx.fillText('💙',W/2,200);
+  ctx.fillStyle='#fff';ctx.font='bold 70px Arial';ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=14;
+  ctx.fillText('Você não precisa',W/2,310);ctx.fillText('cuidar sozinho(a)',W/2,392);ctx.shadowBlur=0;
+  const lg=ctx.createLinearGradient(W/2-200,0,W/2+200,0);lg.addColorStop(0,'rgba(255,255,255,0)');lg.addColorStop(.5,'rgba(255,255,255,.4)');lg.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=lg;ctx.fillRect(W/2-200,416,400,3);
+  ctx.fillStyle='rgba(255,255,255,.75)';ctx.font='32px Arial';
+  wrap(ctx,'O CuidarJuntos conecta toda a família e organiza a saúde e as finanças do seu familiar.',W/2,470,880,50);
+  rr(ctx,120,620,840,90,20,'rgba(255,255,255,.08)','rgba(255,255,255,.15)');
+  ctx.fillStyle='#fff';ctx.font='bold 32px Arial';ctx.fillText('💊 Saúde  ·  💰 Finanças  ·  👨‍👩‍👧 Família',W/2,672);
+  rr(ctx,160,748,760,130,65,'#25D366');
+  ctx.fillStyle='#fff';ctx.font='bold 38px Arial';ctx.fillText('📲 Chamar no WhatsApp',W/2,806);
+  ctx.fillStyle='rgba(255,255,255,.8)';ctx.font='bold 28px Arial';ctx.fillText('(31) 99703-5583',W/2,848);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='24px Arial';ctx.fillText('Acesse a demo gratuita — link na bio',W/2,930);
+  drawLogo(ctx,W/2,1004,56);
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='bold 22px Arial';ctx.fillText('CuidarJuntos · RSO Soluções',W/2,1054);
+  ctx.textAlign='left';
+})();
+
+// ─── STORY 1 ───
+(function(){
+  const cv=document.getElementById('s1'),ctx=cv.getContext('2d'),W=1080,H=1920;
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0A1E3D');bg.addColorStop(1,'#06101F');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#1565C0';ctx.fillRect(0,0,W,8);
+  ctx.textAlign='center';
+  ctx.font='200px Arial';ctx.fillText('😔',W/2,320);
+  ctx.fillStyle='#EF9A9A';ctx.font='bold 76px Arial';ctx.fillText('Sua família já',W/2,460);ctx.fillText('passou por isso?',W/2,548);
+  const dores=['💊 Remédio dado ou não dado?','💸 Quem pagou o quê?','📋 Exames e receitas perdidos','📞 Filhos sem informação'];
+  dores.forEach((d,i)=>{
+    rr(ctx,80,620+i*140,920,112,18,'rgba(255,255,255,.06)','rgba(255,255,255,.1)');
+    ctx.fillStyle='#fff';ctx.font='36px Arial';ctx.textAlign='left';ctx.fillText(d,120,620+i*140+68);ctx.textAlign='center';
+  });
+  const lg=ctx.createLinearGradient(W/2-240,0,W/2+240,0);lg.addColorStop(0,'rgba(100,181,246,0)');lg.addColorStop(.5,'#64B5F6');lg.addColorStop(1,'rgba(100,181,246,0)');
+  ctx.fillStyle=lg;ctx.fillRect(W/2-240,1200,480,4);
+  ctx.fillStyle='#64B5F6';ctx.font='bold 56px Arial';ctx.fillText('Isso tem solução 💙',W/2,1300);
+  drawLogo(ctx,W/2,1440,160);
+  ctx.fillStyle='#fff';ctx.font='bold 64px Arial';ctx.fillText('CuidarJuntos',W/2,1560);
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='34px Arial';ctx.fillText('Saúde e Finanças da Família',W/2,1616);
+  rr(ctx,160,1680,760,110,55,'#1565C0');
+  ctx.fillStyle='#fff';ctx.font='bold 36px Arial';ctx.fillText('📲 (31) 99703-5583',W/2,1746);
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='26px Arial';ctx.fillText('RSO Soluções · Renata Silva',W/2,1856);
+  ctx.textAlign='left';
+})();
+
+// ─── STORY 2 ───
+(function(){
+  const cv=document.getElementById('s2'),ctx=cv.getContext('2d'),W=1080,H=1920;
+  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#0D2B5E');bg.addColorStop(1,'#061020');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#1565C0';ctx.fillRect(0,0,W,6);
+  ctx.textAlign='center';
+  drawLogo(ctx,W/2,160,140);
+  ctx.fillStyle='#fff';ctx.font='bold 72px Arial';ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=14;ctx.fillText('CuidarJuntos',W/2,318);ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,.65)';ctx.font='34px Arial';ctx.fillText('Tudo que sua família precisa',W/2,374);
+  const feats=[
+    {ico:'💊',tit:'Medicamentos',sub:'Confirmação por horário'},
+    {ico:'❤️',tit:'Sinais Vitais',sub:'Alertas automáticos'},
+    {ico:'🏥',tit:'Consultas',sub:'Histórico completo'},
+    {ico:'💰',tit:'Financeiro',sub:'Transparência total'},
+    {ico:'🌙',tit:'Cuidados Diários',sub:'Rotina organizada'},
+    {ico:'🔔',tit:'Notificações',sub:'Família conectada'},
+  ];
+  feats.forEach((f,i)=>{
+    const y=450+i*210;
+    rr(ctx,80,y,920,180,20,'rgba(255,255,255,.06)','rgba(255,255,255,.1)');
+    ctx.font='72px Arial';ctx.fillText(f.ico,200,y+112);
+    ctx.fillStyle='#fff';ctx.font='bold 42px Arial';ctx.textAlign='left';ctx.fillText(f.tit,310,y+90);
+    ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='30px Arial';ctx.fillText(f.sub,310,y+140);
+    ctx.textAlign='center';
+  });
+  rr(ctx,160,1760,760,100,50,'#25D366');
+  ctx.fillStyle='#fff';ctx.font='bold 36px Arial';ctx.fillText('📲 (31) 99703-5583',W/2,1820);
+  ctx.textAlign='left';
+})();
+
+// ─── STORY 3 ───
+(function(){
+  const cv=document.getElementById('s3'),ctx=cv.getContext('2d'),W=1080,H=1920;
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0A1E3D');bg.addColorStop(1,'#0D47A1');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const hl=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,800);hl.addColorStop(0,'rgba(100,181,246,.12)');hl.addColorStop(1,'transparent');
+  ctx.fillStyle=hl;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#1565C0';ctx.fillRect(0,0,W,6);
+  ctx.textAlign='center';
+  ctx.font='160px Arial';ctx.fillText('💙',W/2,220);
+  ctx.fillStyle='#fff';ctx.font='bold 80px Arial';ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=16;ctx.fillText('Comece hoje',W/2,370);ctx.fillStyle='#64B5F6';ctx.fillText('por apenas',W/2,458);ctx.shadowBlur=0;
+  rr(ctx,120,510,840,260,28,'rgba(255,255,255,.08)','rgba(255,255,255,.15)');
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='30px Arial';ctx.fillText('⚡ Ativação única',W/2,566);
+  ctx.fillStyle='#fff';ctx.font='bold 110px Arial';ctx.fillText('R$ 197',W/2,670);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='28px Arial';ctx.fillText('Configuração completa em 24h',W/2,726);
+  rr(ctx,120,820,840,300,28,'rgba(21,101,192,.3)','#1565C0',3);
+  rr(ctx,W/2-90,806,180,34,17,'#1565C0');
+  ctx.fillStyle='#fff';ctx.font='bold 18px Arial';ctx.fillText('RECOMENDADO',W/2,829);
+  ctx.fillStyle='rgba(255,255,255,.5)';ctx.font='30px Arial';ctx.fillText('💙 Plano Família',W/2,886);
+  ctx.fillStyle='#fff';ctx.font='bold 128px Arial';ctx.fillText('R$ 79',W/2,1002);
+  ctx.fillStyle='#64B5F6';ctx.font='bold 44px Arial';ctx.fillText('/mês',W/2+200,958);
+  ctx.fillStyle='rgba(255,255,255,.45)';ctx.font='28px Arial';ctx.fillText('Acesso · Suporte · Atualizações',W/2,1082);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='italic 30px Arial';ctx.fillText('Menos que uma consulta particular!',W/2,1180);
+  const steps=['📞 Me chame no WhatsApp','⚙️ Configuro tudo em 24h','✅ Família organizada'];
+  steps.forEach((s,i)=>{
+    rr(ctx,100,1240+i*152,880,120,18,'rgba(255,255,255,.05)','rgba(255,255,255,.1)');
+    ctx.fillStyle='#fff';ctx.font='36px Arial';ctx.textAlign='left';ctx.fillText(s,160,1240+i*152+70);ctx.textAlign='center';
+  });
+  rr(ctx,120,1720,840,130,65,'#25D366');
+  ctx.fillStyle='#fff';ctx.font='bold 46px Arial';ctx.fillText('📲 (31) 99703-5583',W/2,1798);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='26px Arial';ctx.fillText('RSO Soluções · Renata Silva',W/2,1876);
+  ctx.textAlign='left';
+})();
+</script>
+</body>
+</html>
