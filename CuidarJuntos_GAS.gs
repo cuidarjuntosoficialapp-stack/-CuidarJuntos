@@ -1,5 +1,5 @@
 // ============================================================
-// CuidarJuntos — Google Apps Script v1.0
+// CuidarJuntos — Google Apps Script v2.0
 // Backend multi-paciente
 // E-mail do projeto: cuidarjuntos.oficial.app@gmail.com
 // ============================================================
@@ -7,8 +7,15 @@
 // ─── CONFIGURAÇÃO GLOBAL ────────────────────────────────────
 const CONFIG = {
   PASTA_RAIZ_NOME: 'CuidarJuntos - Pacientes',
-  VERSION: '1.0',
+  VERSION: '2.0',
 };
+
+// ─── HELPER: busca planilhaId salvo nas propriedades do script ──
+function getPlanilhaId(p) {
+  return (p && p.planilhaId) ||
+         (p && p.dados && p.dados.planilhaId) ||
+         PropertiesService.getScriptProperties().getProperty('PLANILHA_ID') || '';
+}
 
 // ─── ROTEADOR PRINCIPAL ─────────────────────────────────────
 function doGet(e)  { return rotear(e); }
@@ -19,16 +26,26 @@ function rotear(e) {
     const p = e.parameter || {};
     const b = e.postData ? JSON.parse(e.postData.contents || '{}') : {};
     const params = Object.assign({}, p, b);
-    const action = params.action || '';
+    // CORRIGIDO: aceita tanto 'acao' (app) quanto 'action' (legado)
+    const action = params.acao || params.action || '';
 
     const rotas = {
       // Sistema
       ping:                   () => ok('pong'),
       criarPaciente:          () => criarPaciente(params),
       listarPacientes:        () => listarPacientes(),
+      configurar:             () => configurarApp(params),
 
       // Auth
       login:                  () => login(params),
+      listarUsuarios:         () => listarUsuariosApp(params),
+      desativarUsuario:       () => desativarUsuarioApp(params),
+      cadastrarUsuario:       () => cadastrarUsuarioApp(params),
+      editarUsuario:          () => editarUsuarioApp(params),
+      alterarSenha:           () => alterarSenhaApp(params),
+
+      // GENÉRICO — app usa api('salvar', 'tabela', dados)
+      salvar:                 () => salvarApp(params),
 
       // Sinais vitais
       getVitais:              () => getRegistros(params, 'Sinais_Vitais'),
@@ -66,10 +83,8 @@ function rotear(e) {
       getChat:                () => getRegistros(params, 'Chat_Familiar'),
       salvarMensagem:         () => salvarRegistro(params, 'Chat_Familiar', colunasChat()),
 
-      // Genérico — ação: salvarRegistro com {aba, dados}
+      // Genérico legado
       salvarRegistro:         () => salvarRegistroGenerico(params),
-
-      // Upload de arquivo
       uploadArquivo:          () => uploadArquivo(params),
       excluirRegistro:        () => excluirRegistro(params),
     };
@@ -83,20 +98,26 @@ function rotear(e) {
 }
 
 // ============================================================
+// CONFIGURAR — salva planilhaId nas propriedades do script
+// ============================================================
+function configurarApp(p) {
+  const planilhaId = (p.dados && p.dados.planilhaId) || p.planilhaId || '';
+  if (!planilhaId) return erro('planilhaId obrigatório');
+  PropertiesService.getScriptProperties().setProperty('PLANILHA_ID', planilhaId);
+  return ok({ configurado: true, planilhaId: planilhaId });
+}
+
+// ============================================================
 // CRIAÇÃO DE ESTRUTURA DO PACIENTE
 // ============================================================
 function criarPaciente(p) {
   const nome = p.nomePaciente;
   if (!nome) return erro('nomePaciente obrigatório');
 
-  // 1. Pasta raiz
   const pastaRaiz = obterOuCriarPasta(CONFIG.PASTA_RAIZ_NOME, null);
-
-  // 2. Pasta do paciente
   const nomePasta = 'Paciente - ' + nome;
   const pastaPaciente = obterOuCriarPasta(nomePasta, pastaRaiz.getId());
 
-  // 3. Subpastas
   const subpastas = ['Anexos', 'Relatorios', 'Comprovantes', 'Exames', 'Receitas_Medicas', 'Documentos'];
   const idsSubpastas = {};
   subpastas.forEach(sub => {
@@ -104,7 +125,6 @@ function criarPaciente(p) {
     idsSubpastas[sub] = pasta.getId();
   });
 
-  // 4. Planilha do paciente
   let planilhaId = '';
   const arquivos = pastaPaciente.getFilesByName('Dados - ' + nome);
   if (arquivos.hasNext()) {
@@ -116,7 +136,9 @@ function criarPaciente(p) {
     criarAbas(ss, nome, p);
   }
 
-  // 5. Salvar na aba de cadastro
+  // Salva planilhaId automaticamente nas propriedades
+  PropertiesService.getScriptProperties().setProperty('PLANILHA_ID', planilhaId);
+
   const ss = SpreadsheetApp.openById(planilhaId);
   const aba = ss.getSheetByName('Cadastro_Paciente');
   if (aba && aba.getLastRow() < 2) {
@@ -136,65 +158,45 @@ function criarPaciente(p) {
 }
 
 function criarAbas(ss, nomePaciente, p) {
-  // Remove aba padrão
-  const abaDefault = ss.getSheets()[0];
+  const abasExistentes = ss.getSheets().map(s => s.getName());
+  if (abasExistentes[0] === 'Sheet1' || abasExistentes[0] === 'Página1' || abasExistentes[0] === 'Plan1') {
+    ss.deleteSheet(ss.getSheets()[0]);
+  }
 
   const abas = [
-    { nome: 'Cadastro_Paciente',           colunas: ['ID','Nome','Apelido','DataNasc','Diagnostico','PastaId','PlanilhaId','CriadoEm'] },
-    { nome: 'Usuarios_e_Permissoes',       colunas: ['ID','Nome','Role','Senha','Email','Ativo','CriadoEm'] },
-    { nome: 'Receita_Mensal',              colunas: ['ID','Competencia','Tipo','Descricao','Valor','DataEntrada','Observacao','RegistradoPor','CriadoEm'] },
-    { nome: 'Saldo_Banco',                 colunas: ['ID','Data','Tipo','Descricao','Valor','SaldoApos','Banco','Observacao','RegistradoPor','CriadoEm'] },
-    { nome: 'Despesas',                    colunas: ['ID','Competencia','Data','Categoria','Descricao','Valor','PagoPor','Comprovante','Status','Observacao','RegistradoPor','CriadoEm'] },
-    { nome: 'Complementacao_Filhos',       colunas: ['ID','Competencia','Filho','Cota','Comprou','Diferenca','Status','Observacao','CriadoEm'] },
-    { nome: 'Sinais_Vitais',               colunas: ['ID','Data','Hora','Sistolica','Diastolica','FC','Saturacao','Temperatura','Glicemia','Nivel','Observacao','RegistradoPor','CriadoEm'] },
-    { nome: 'Medicamentos',                colunas: ['ID','Nome','Dose','Via','Horarios','Prescricao','Medico','Inicio','Termino','Ativo','Observacao','LinkReceita','CriadoEm'] },
-    { nome: 'Administracoes_Medicamentos', colunas: ['ID','MedicamentoId','Medicamento','Data','Hora','Dose','Via','RegistradoPor','Observacao','CriadoEm'] },
-    { nome: 'Cuidados_Diarios',            colunas: ['ID','Data','Descricao','Categoria','Feito','HoraFeito','RegistradoPor','Observacao','CriadoEm'] },
-    { nome: 'Consultas_Visitas',           colunas: ['ID','Data','Hora','Especialidade','Medico','Local','Status','Observacao','LinkDocumento','RegistradoPor','CriadoEm'] },
-    { nome: 'Exames',                      colunas: ['ID','Data','Hora','Nome','Laboratorio','Status','Resultado','LinkResultado','Observacao','RegistradoPor','CriadoEm'] },
-    { nome: 'Chat_Familiar',               colunas: ['ID','DataHora','Remetente','Role','Mensagem','CriadoEm'] },
-    { nome: 'Relatorios',                  colunas: ['ID','Competencia','TipoRelatorio','LinkArquivo','GeradoPor','CriadoEm'] },
+    { nome: 'Cadastro_Paciente',       colunas: ['ID','Nome','Apelido','DataNasc','Diagnostico','PastaId','PlanilhaId','CriadoEm'], cor: '#1565C0' },
+    { nome: 'Usuarios_e_Permissoes',   colunas: ['ID','Nome','Role','Senha','Email','Ativo','CriadoEm'], cor: '#6A1B9A' },
+    { nome: 'Sinais_Vitais',           colunas: ['ID','Data','Hora','Sistolica','Diastolica','FC','Saturacao','Temperatura','Glicemia','Nivel','Observacao','RegistradoPor','CriadoEm'], cor: '#C62828' },
+    { nome: 'Medicamentos',            colunas: ['ID','Nome','Dose','Via','Horarios','Prescricao','Medico','Inicio','Termino','Ativo','Observacao','LinkReceita','CriadoEm'], cor: '#2E7D32' },
+    { nome: 'Administracoes_Medicamentos', colunas: ['ID','MedicamentoId','Medicamento','Data','Hora','Dose','Via','RegistradoPor','Observacao','CriadoEm'], cor: '#388E3C' },
+    { nome: 'Cuidados_Diarios',        colunas: ['ID','Data','Descricao','Categoria','Feito','HoraFeito','RegistradoPor','Observacao','CriadoEm'], cor: '#00695C' },
+    { nome: 'Consultas_Visitas',       colunas: ['ID','Data','Hora','Especialidade','Medico','Local','Status','Observacao','LinkDocumento','RegistradoPor','CriadoEm'], cor: '#0277BD' },
+    { nome: 'Exames',                  colunas: ['ID','Data','Hora','Nome','Laboratorio','Status','Resultado','LinkResultado','Observacao','RegistradoPor','CriadoEm'], cor: '#6A1B9A' },
+    { nome: 'Receita_Mensal',          colunas: ['ID','Competencia','Tipo','Descricao','Valor','DataEntrada','Observacao','RegistradoPor','CriadoEm'], cor: '#E65100' },
+    { nome: 'Saldo_Banco',             colunas: ['ID','Data','Tipo','Descricao','Valor','SaldoApos','Banco','Observacao','RegistradoPor','CriadoEm'], cor: '#4E342E' },
+    { nome: 'Despesas',                colunas: ['ID','Competencia','Data','Categoria','Descricao','Valor','PagoPor','Comprovante','Status','Observacao','RegistradoPor','CriadoEm'], cor: '#BF360C' },
+    { nome: 'Complementacao_Filhos',   colunas: ['ID','Competencia','Filho','Cota','Comprou','Diferenca','Status','Observacao','CriadoEm'], cor: '#F57F17' },
+    { nome: 'Chat_Familiar',           colunas: ['ID','DataHora','Remetente','Role','Mensagem','CriadoEm'], cor: '#37474F' },
   ];
 
-  const cores = {
-    'Cadastro_Paciente':           '#1565C0',
-    'Usuarios_e_Permissoes':       '#6A1B9A',
-    'Receita_Mensal':              '#2E7D32',
-    'Saldo_Banco':                 '#1976D2',
-    'Despesas':                    '#E65100',
-    'Complementacao_Filhos':       '#F57F17',
-    'Sinais_Vitais':               '#C62828',
-    'Medicamentos':                '#00838F',
-    'Administracoes_Medicamentos': '#00695C',
-    'Cuidados_Diarios':            '#4527A0',
-    'Consultas_Visitas':           '#1565C0',
-    'Exames':                      '#558B2F',
-    'Chat_Familiar':               '#37474F',
-    'Relatorios':                  '#4E342E',
-  };
-
-  abas.forEach((def, i) => {
-    let aba;
-    if (i === 0) {
-      abaDefault.setName(def.nome);
-      aba = abaDefault;
-    } else {
-      aba = ss.insertSheet(def.nome);
-    }
-    // Cabeçalho
-    aba.getRange(1, 1, 1, def.colunas.length).setValues([def.colunas]);
-    aba.getRange(1, 1, 1, def.colunas.length)
-      .setBackground(cores[def.nome] || '#1565C0')
+  abas.forEach(cfg => {
+    if (ss.getSheetByName(cfg.nome)) return;
+    const sheet = ss.insertSheet(cfg.nome);
+    sheet.getRange(1, 1, 1, cfg.colunas.length).setValues([cfg.colunas]);
+    sheet.getRange(1, 1, 1, cfg.colunas.length)
+      .setBackground(cfg.cor)
       .setFontColor('#FFFFFF')
       .setFontWeight('bold');
-    aba.setFrozenRows(1);
-    aba.setColumnWidth(1, 220);
+    sheet.setFrozenRows(1);
   });
+
+  // Criar usuário admin padrão
+  const abaUsers = ss.getSheetByName('Usuarios_e_Permissoes');
+  if (abaUsers && abaUsers.getLastRow() < 2) {
+    abaUsers.appendRow([Utilities.getUuid(), 'Admin', 'admin', 'admin123', 'admin@cuidarjuntos.com', true, new Date()]);
+  }
 }
 
-// ============================================================
-// LISTAR PACIENTES
-// ============================================================
 function listarPacientes() {
   const pastaRaiz = obterOuCriarPasta(CONFIG.PASTA_RAIZ_NOME, null);
   const subpastas = pastaRaiz.getFolders();
@@ -211,32 +213,189 @@ function listarPacientes() {
 }
 
 // ============================================================
-// LOGIN
+// LOGIN — CORRIGIDO
 // ============================================================
 function login(p) {
-  const { planilhaId, nome, senha, role } = p;
-  if (!planilhaId) return erro('planilhaId obrigatório');
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado. Configure a planilha em Configurações.');
 
-  const ss   = SpreadsheetApp.openById(planilhaId);
-  const aba  = ss.getSheetByName('Usuarios_e_Permissoes');
+  // Aceita email/senha de dentro de 'dados' ou direto no params
+  const email = (p.dados && p.dados.email) || p.email || p.nome || '';
+  const senha = (p.dados && p.dados.senha) || p.senha || '';
+
+  if (!email) return erro('E-mail ou usuário obrigatório');
+  if (!senha) return erro('Senha obrigatória');
+
+  const ss = SpreadsheetApp.openById(planilhaId);
+  const aba = ss.getSheetByName('Usuarios_e_Permissoes');
+  if (!aba) return erro('Aba de usuários não encontrada. Execute "Criar estrutura" primeiro.');
+
   const rows = aba.getDataRange().getValues();
-
   for (let i = 1; i < rows.length; i++) {
-    const [id, nomeU, roleU, senhaU, email, ativo] = rows[i];
-    if (nomeU.toLowerCase() === nome.toLowerCase() && senhaU === senha && ativo) {
-      const rolesValidos = role === 'filho' ? ['filho','filha'] : ['cuidador','enfermagem'];
-      if (!rolesValidos.includes(roleU.toLowerCase())) continue;
-      return ok({ id, nome: nomeU, role: roleU, email });
+    const [id, nomeU, roleU, senhaU, emailU, ativo] = rows[i];
+    if (!ativo) continue;
+    const matchEmail = emailU && String(emailU).toLowerCase() === email.toLowerCase();
+    const matchNome  = nomeU  && String(nomeU).toLowerCase()  === email.toLowerCase();
+    if ((matchEmail || matchNome) && String(senhaU) === String(senha)) {
+      // Mapeia role da planilha → perfil do app
+      const roleNorm = String(roleU).toLowerCase();
+      const perfil = roleNorm === 'admin' ? 'admin' :
+                     ['filho','filha'].includes(roleNorm) ? 'filho' : 'enfermagem';
+      return ok({ usuario: { id, nome: nomeU, perfil, email: emailU || email } });
     }
   }
-  return erro('Credenciais inválidas');
+  return erro('Usuário ou senha incorretos');
+}
+
+// ============================================================
+// GERENCIAMENTO DE USUÁRIOS
+// ============================================================
+function listarUsuariosApp(p) {
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado');
+  const ss  = SpreadsheetApp.openById(planilhaId);
+  const aba = ss.getSheetByName('Usuarios_e_Permissoes');
+  if (!aba) return erro('Aba não encontrada');
+  const rows = aba.getDataRange().getValues();
+  if (rows.length < 2) return ok([]);
+  const lista = rows.slice(1).map(r => ({
+    id: r[0], nome: r[1], perfil: r[2], email: r[4], ativo: r[5]
+  }));
+  return ok(lista);
+}
+
+function cadastrarUsuarioApp(p) {
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado');
+  const dados = p.dados || {};
+  if (!dados.Email && !dados.email) return erro('Email obrigatório');
+  if (!dados.Senha && !dados['Senha Hash']) return erro('Senha obrigatória');
+  const ss  = SpreadsheetApp.openById(planilhaId);
+  const aba = ss.getSheetByName('Usuarios_e_Permissoes');
+  const email = dados.Email || dados.email || '';
+  const senha = dados.Senha || dados['Senha Hash'] || '';
+  const nome  = dados.Nome  || email.split('@')[0];
+  const perfil = dados.Perfil || dados.perfil || 'filho';
+  aba.appendRow([Utilities.getUuid(), nome, perfil, senha, email, true, new Date()]);
+  return ok({ criado: true });
+}
+
+function editarUsuarioApp(p) {
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado');
+  const dados = p.dados || {};
+  const id = p.id || dados.id || '';
+  if (!id) return erro('ID obrigatório');
+  const ss  = SpreadsheetApp.openById(planilhaId);
+  const aba = ss.getSheetByName('Usuarios_e_Permissoes');
+  const rows = aba.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === id) {
+      if (dados.Nome   || dados.nome)   aba.getRange(i+1, 2).setValue(dados.Nome || dados.nome);
+      if (dados.Perfil || dados.perfil) aba.getRange(i+1, 3).setValue(dados.Perfil || dados.perfil);
+      if (dados.Senha  || dados['Nova Senha']) aba.getRange(i+1, 4).setValue(dados.Senha || dados['Nova Senha']);
+      if (dados.Email  || dados.email)  aba.getRange(i+1, 5).setValue(dados.Email || dados.email);
+      return ok({ atualizado: true });
+    }
+  }
+  return erro('Usuário não encontrado');
+}
+
+function desativarUsuarioApp(p) {
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado');
+  const id = (p.dados && p.dados.id) || p.id || '';
+  if (!id) return erro('ID obrigatório');
+  const ss  = SpreadsheetApp.openById(planilhaId);
+  const aba = ss.getSheetByName('Usuarios_e_Permissoes');
+  const rows = aba.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] === id) {
+      aba.getRange(i+1, 6).setValue(false);
+      return ok({ desativado: true });
+    }
+  }
+  return erro('Usuário não encontrado');
+}
+
+function alterarSenhaApp(p) {
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado');
+  const dados = p.dados || {};
+  const email      = dados.email     || p.email     || '';
+  const senhaAtual = dados.senhaAtual || p.senhaAtual || '';
+  const novaSenha  = dados.novaSenha  || p.novaSenha  || '';
+  if (!email || !senhaAtual || !novaSenha) return erro('Dados incompletos');
+  const ss  = SpreadsheetApp.openById(planilhaId);
+  const aba = ss.getSheetByName('Usuarios_e_Permissoes');
+  const rows = aba.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    const emailU = String(rows[i][4]).toLowerCase();
+    if (emailU === email.toLowerCase() && String(rows[i][3]) === String(senhaAtual)) {
+      aba.getRange(i+1, 4).setValue(novaSenha);
+      return ok({ alterado: true });
+    }
+  }
+  return erro('Senha atual incorreta');
+}
+
+// ============================================================
+// SALVAR GENÉRICO — app usa api('salvar', 'tabela', dados)
+// ============================================================
+const TABELA_PARA_ABA = {
+  vitais:   'Sinais_Vitais',
+  meds:     'Administracoes_Medicamentos',
+  medCad:   'Medicamentos',
+  visitas:  'Consultas_Visitas',
+  exames:   'Exames',
+  receitas: 'Receita_Mensal',
+  saldo:    'Saldo_Banco',
+  despesas: 'Despesas',
+  cuidados: 'Cuidados_Diarios',
+  chat:     'Chat_Familiar',
+  cotas:    'Complementacao_Filhos',
+};
+
+function salvarApp(p) {
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado. Configure em Configurações → ID da Planilha.');
+
+  const tabela = p.tabela || '';
+  const nomeAba = TABELA_PARA_ABA[tabela];
+  if (!nomeAba) return erro('Tabela desconhecida: ' + tabela);
+
+  const colunas = COLUNAS_POR_ABA[nomeAba];
+  if (!colunas) return erro('Colunas não definidas para: ' + nomeAba);
+
+  const ss  = SpreadsheetApp.openById(planilhaId);
+  const aba = ss.getSheetByName(nomeAba);
+  if (!aba) return erro('Aba não encontrada: ' + nomeAba + '. Execute "Criar estrutura" primeiro.');
+
+  const dados = normalizarCampos(p.dados || {});
+  const id    = dados.ID || Utilities.getUuid();
+  const now   = new Date();
+
+  const linha = colunas.map(col => {
+    if (col === 'ID')        return id;
+    if (col === 'CriadoEm') return now;
+    return dados[col] !== undefined ? dados[col] : '';
+  });
+
+  // Atualizar se ID já existe
+  const existing = aba.getDataRange().getValues();
+  for (let i = 1; i < existing.length; i++) {
+    if (existing[i][0] === id) {
+      aba.getRange(i+1, 1, 1, linha.length).setValues([linha]);
+      return ok({ id, atualizado: true });
+    }
+  }
+  aba.appendRow(linha);
+  return ok({ id, criado: true });
 }
 
 // ============================================================
 // CRUD GENÉRICO — ação usada pelo app (salvarRegistro)
 // ============================================================
-
-// Mapa de colunas por aba (para escrita genérica vinda do app)
 const COLUNAS_POR_ABA = {
   Sinais_Vitais:               ['ID','Data','Hora','Sistolica','Diastolica','FC','Saturacao','Temperatura','Glicemia','Nivel','Observacao','RegistradoPor','CriadoEm'],
   Medicamentos:                ['ID','Nome','Dose','Via','Horarios','Prescricao','Medico','Inicio','Termino','Ativo','Observacao','LinkReceita','CriadoEm'],
@@ -251,9 +410,7 @@ const COLUNAS_POR_ABA = {
   Chat_Familiar:               ['ID','DataHora','Remetente','Role','Mensagem','CriadoEm'],
 };
 
-// Mapa de nomes de campos do app → colunas da planilha
 const ALIAS_CAMPOS = {
-  // vitais
   sis_mmhg:      'Sistolica',
   dia_mmhg:      'Diastolica',
   fc_bpm:        'FC',
@@ -262,9 +419,11 @@ const ALIAS_CAMPOS = {
   gli_mgdl:      'Glicemia',
   alertas:       'Nivel',
   observacoes:   'Observacao',
+  obs:           'Observacao',
   registro_por:  'RegistradoPor',
   registrado_por:'RegistradoPor',
-  // medicamentos
+  'registrado por': 'RegistradoPor',
+  'registrado_por': 'RegistradoPor',
   nome:          'Nome',
   dose:          'Dose',
   via:           'Via',
@@ -273,54 +432,54 @@ const ALIAS_CAMPOS = {
   medico:        'Medico',
   inicio:        'Inicio',
   fim:           'Termino',
-  // administrações
   medicamento:   'Medicamento',
   hora:          'Hora',
   data:          'Data',
-  // cuidados
-  descricao:     'Descricao',
-  categoria:     'Categoria',
-  tipo:          'Categoria',
-  humor:         'Categoria',
-  // visitas
   especialidade: 'Especialidade',
   local:         'Local',
   status:        'Status',
-  // chat
+  laboratorio:   'Laboratorio',
+  resultado:     'Resultado',
+  tipo:          'Tipo',
+  descricao:     'Descricao',
+  valor:         'Valor',
+  competencia:   'Competencia',
+  filho:         'Filho',
   usuario:       'Remetente',
   perfil:        'Role',
   mensagem:      'Mensagem',
-  // financeiro
-  valor:         'Valor',
-  // geral
   data_hora:     'DataHora',
+  'data pagto':  'DataEntrada',
+  'data pagto':  'Data',
+  qtd:           'Qtd',
+  total:         'Total',
 };
 
 function normalizarCampos(dados) {
   const out = {};
   Object.keys(dados).forEach(k => {
-    const col = ALIAS_CAMPOS[k] || k.charAt(0).toUpperCase() + k.slice(1);
+    const kLower = k.toLowerCase();
+    const col = ALIAS_CAMPOS[kLower] || ALIAS_CAMPOS[k] || k.charAt(0).toUpperCase() + k.slice(1);
     out[col] = dados[k];
   });
   return out;
 }
 
 function salvarRegistroGenerico(p) {
-  if (!p.planilhaId) return erro('planilhaId obrigatório');
-  if (!p.aba)        return erro('aba obrigatória');
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado');
+  if (!p.aba)      return erro('aba obrigatória');
 
   const colunas = COLUNAS_POR_ABA[p.aba];
   if (!colunas) return erro('Aba desconhecida: ' + p.aba);
 
-  const ss  = SpreadsheetApp.openById(p.planilhaId);
+  const ss  = SpreadsheetApp.openById(planilhaId);
   const aba = ss.getSheetByName(p.aba);
   if (!aba) return erro('Aba não encontrada: ' + p.aba);
 
-  // Normalizar campos vindos do app
   const dados = normalizarCampos(p.dados || {});
-
-  const id  = dados.ID || Utilities.getUuid();
-  const now = new Date();
+  const id    = dados.ID || Utilities.getUuid();
+  const now   = new Date();
 
   const linha = colunas.map(col => {
     if (col === 'ID')        return id;
@@ -328,24 +487,21 @@ function salvarRegistroGenerico(p) {
     return dados[col] !== undefined ? dados[col] : '';
   });
 
-  // Atualizar se já existe
   const existing = aba.getDataRange().getValues();
   for (let i = 1; i < existing.length; i++) {
     if (existing[i][0] === id) {
-      aba.getRange(i + 1, 1, 1, linha.length).setValues([linha]);
+      aba.getRange(i+1, 1, 1, linha.length).setValues([linha]);
       return ok({ id, atualizado: true });
     }
   }
-
   aba.appendRow(linha);
   return ok({ id, criado: true });
 }
 
-// ============================================================
-// CRUD GENÉRICO (funções por aba — mantidas para compatibilidade)
-// ============================================================
 function getRegistros(p, nomeAba) {
-  const ss  = SpreadsheetApp.openById(p.planilhaId);
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado');
+  const ss  = SpreadsheetApp.openById(planilhaId);
   const aba = ss.getSheetByName(nomeAba);
   if (!aba) return erro('Aba não encontrada: ' + nomeAba);
 
@@ -359,49 +515,48 @@ function getRegistros(p, nomeAba) {
     return obj;
   });
 
-  // Filtro por competência se informado
   if (p.competencia) return ok(rows.filter(r => r.Competencia === p.competencia));
   return ok(rows);
 }
 
 function salvarRegistro(p, nomeAba, colunas) {
-  const ss  = SpreadsheetApp.openById(p.planilhaId);
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado');
+  const ss  = SpreadsheetApp.openById(planilhaId);
   const aba = ss.getSheetByName(nomeAba);
   if (!aba) return erro('Aba não encontrada: ' + nomeAba);
 
   const id  = p.id || Utilities.getUuid();
   const now = new Date();
 
-  // Montar linha na ordem das colunas
   const linha = colunas.map(col => {
     if (col === 'ID')        return id;
     if (col === 'CriadoEm') return now;
     return p[col] !== undefined ? p[col] : '';
   });
 
-  // Atualizar se ID já existe
   const dados = aba.getDataRange().getValues();
   for (let i = 1; i < dados.length; i++) {
     if (dados[i][0] === id) {
-      aba.getRange(i + 1, 1, 1, linha.length).setValues([linha]);
+      aba.getRange(i+1, 1, 1, linha.length).setValues([linha]);
       return ok({ id, atualizado: true });
     }
   }
-
-  // Inserir novo
   aba.appendRow(linha);
   return ok({ id, criado: true });
 }
 
 function excluirRegistro(p) {
-  const ss  = SpreadsheetApp.openById(p.planilhaId);
+  const planilhaId = getPlanilhaId(p);
+  if (!planilhaId) return erro('planilhaId não configurado');
+  const ss  = SpreadsheetApp.openById(planilhaId);
   const aba = ss.getSheetByName(p.aba);
   if (!aba) return erro('Aba não encontrada');
 
   const dados = aba.getDataRange().getValues();
   for (let i = 1; i < dados.length; i++) {
     if (dados[i][0] === p.id) {
-      aba.deleteRow(i + 1);
+      aba.deleteRow(i+1);
       return ok({ excluido: true });
     }
   }
@@ -412,18 +567,18 @@ function excluirRegistro(p) {
 // UPLOAD DE ARQUIVO
 // ============================================================
 function uploadArquivo(p) {
-  const { planilhaId, subpasta, nomeArquivo, mimeType, conteudoBase64 } = p;
+  const planilhaId = getPlanilhaId(p);
+  const { subpasta, nomeArquivo, mimeType, conteudoBase64 } = p;
   if (!conteudoBase64) return erro('Conteúdo base64 obrigatório');
 
-  // Encontrar pasta do paciente
   const pastaRaiz = obterOuCriarPasta(CONFIG.PASTA_RAIZ_NOME, null);
   const ss = SpreadsheetApp.openById(planilhaId);
   const nomePlanilha = ss.getName().replace('Dados - ', '');
   const pastaPaciente = obterOuCriarPasta('Paciente - ' + nomePlanilha, pastaRaiz.getId());
   const pastaDestino  = obterOuCriarPasta(subpasta || 'Anexos', pastaPaciente.getId());
 
-  const bytes  = Utilities.base64Decode(conteudoBase64);
-  const blob   = Utilities.newBlob(bytes, mimeType || 'application/octet-stream', nomeArquivo || 'arquivo');
+  const bytes   = Utilities.base64Decode(conteudoBase64);
+  const blob    = Utilities.newBlob(bytes, mimeType || 'application/octet-stream', nomeArquivo || 'arquivo');
   const arquivo = pastaDestino.createFile(blob);
   arquivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
@@ -474,6 +629,7 @@ function onOpen() {
   try {
     SpreadsheetApp.getUi().createMenu('CuidarJuntos')
       .addItem('Criar estrutura do paciente', 'menuCriarPaciente')
+      .addItem('Ver ID da Planilha', 'menuVerPlanilhaId')
       .addItem('Testar conexão', 'menuTestar')
       .addToUi();
   } catch(e) { Logger.log('onOpen: ' + e.message); }
@@ -484,21 +640,29 @@ function menuCriarPaciente() {
   const resp = ui.prompt('Nome completo do paciente:');
   if (resp.getSelectedButton() !== ui.Button.OK) return;
   const r = criarPaciente({ nomePaciente: resp.getResponseText() });
-  ui.alert('Estrutura criada!\n' + r.getContent());
+  const data = JSON.parse(r.getContent());
+  ui.alert('Estrutura criada!\n\nID da Planilha:\n' + (data.data && data.data.planilhaId || '') + '\n\nCole este ID no app em Configurações → ID da Planilha');
 }
 
-// Executa diretamente pelo botão "Executar" do editor GAS
-// Edite o nome do paciente antes de executar
-function criarPacienteDemo() {
-  const r = criarPaciente({
-    nomePaciente: 'José do Carmo',   // ← altere aqui
-    apelido:      'Carmito',
-    diagnostico:  'Hipertensão, Diabetes tipo 2',
-  });
-  Logger.log(r.getContent());
+function menuVerPlanilhaId() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const ui = SpreadsheetApp.getUi();
+    ui.alert('ID desta Planilha:\n\n' + ss.getId() + '\n\nCole este ID no app em Configurações → ID da Planilha');
+  } catch(e) { Logger.log(e.message); }
 }
 
 function menuTestar() {
   try { SpreadsheetApp.getUi().alert('✅ Apps Script funcionando!'); }
   catch(e) { Logger.log('✅ Apps Script funcionando!'); }
+}
+
+// Executa diretamente pelo botão "Executar" do editor GAS
+function criarPacienteDemo() {
+  const r = criarPaciente({
+    nomePaciente: 'José do Carmo',
+    apelido:      'Carmito',
+    diagnostico:  'Hipertensão, Diabetes tipo 2',
+  });
+  Logger.log(r.getContent());
 }
