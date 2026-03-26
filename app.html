@@ -290,16 +290,21 @@ body{display:flex;justify-content:center;}
   </div>
   <div style="flex:1;padding:20px 18px 0;background:var(--bg);">
     <div style="font-size:10px;color:var(--t2);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;">Perfil de acesso</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
       <div id="pf1" onclick="sp('pf1')" class="pbtn sel">
-        <div style="font-size:24px;">👨‍👩‍👧</div>
-        <div style="font-size:11px;font-weight:600;color:white;margin-top:5px;">Filhos</div>
-        <div style="font-size:8px;color:rgba(255,255,255,.5);font-family:'IBM Plex Mono',monospace;margin-top:2px;">gestão financeira</div>
+        <div style="font-size:22px;">👨‍👩‍👧</div>
+        <div style="font-size:10px;font-weight:600;color:white;margin-top:5px;">Filhos</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.5);font-family:'IBM Plex Mono',monospace;margin-top:2px;">família</div>
       </div>
       <div id="pf2" onclick="sp('pf2')" class="pbtn un">
-        <div style="font-size:24px;">🏥</div>
-        <div style="font-size:11px;font-weight:600;color:var(--tx);margin-top:5px;">Enfermagem</div>
-        <div style="font-size:8px;color:var(--t3);font-family:'IBM Plex Mono',monospace;margin-top:2px;">cuidados clínicos</div>
+        <div style="font-size:22px;">🏥</div>
+        <div style="font-size:10px;font-weight:600;color:var(--tx);margin-top:5px;">Equipe</div>
+        <div style="font-size:8px;color:var(--t3);font-family:'IBM Plex Mono',monospace;margin-top:2px;">clínico</div>
+      </div>
+      <div id="pf3" onclick="sp('pf3')" class="pbtn un">
+        <div style="font-size:22px;">⚙️</div>
+        <div style="font-size:10px;font-weight:600;color:var(--tx);margin-top:5px;">Admin</div>
+        <div style="font-size:8px;color:var(--t3);font-family:'IBM Plex Mono',monospace;margin-top:2px;">gestor</div>
       </div>
     </div>
     <div style="background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:16px;margin-bottom:11px;">
@@ -1289,7 +1294,7 @@ function api(acao, tabela, dados) {
 
 function apiGet(acao, tabela, params) {
   if (!GAS_URL || GAS_URL === 'COLE_SUA_URL_AQUI') return Promise.resolve({ ok: false, offline: true });
-  var qs = '?acao=' + acao + (tabela ? '&tabela=' + tabela : '');
+  var qs = '?acao=' + acao + '&planilhaId=' + encodeURIComponent(GAS_PLANILHA_ID) + (tabela ? '&tabela=' + tabela : '');
   if (params) Object.keys(params).forEach(function(k){ qs += '&' + k + '=' + encodeURIComponent(params[k]); });
   return _apiFetch(GAS_URL + qs, { method: 'GET' });
 }
@@ -1536,15 +1541,15 @@ function goGuarded(screen, profile){
 
 // ── LOGIN ──
 function sp(id){
-  ['pf1','pf2'].forEach(function(p){
-    var e=document.getElementById(p);e.className='pbtn un';
+  ['pf1','pf2','pf3'].forEach(function(p){
+    var e=document.getElementById(p);if(!e)return;e.className='pbtn un';
     var l=e.querySelector('div:nth-child(2)');var s=e.querySelector('div:nth-child(3)');
     if(l)l.style.color='var(--tx)';if(s)s.style.color='var(--t3)';
   });
-  var sel=document.getElementById(id);sel.className='pbtn sel';
+  var sel=document.getElementById(id);if(!sel)return;sel.className='pbtn sel';
   var l=sel.querySelector('div:nth-child(2)');var s=sel.querySelector('div:nth-child(3)');
   if(l)l.style.color='white';if(s)s.style.color='rgba(255,255,255,.5)';
-  curProfile=id==='pf1'?'filho':'enfermagem';
+  curProfile=id==='pf1'?'filho':id==='pf3'?'admin':'enfermagem';
 }
 function doLogin(){
   var email = (document.getElementById('lgu').value||'').trim();
@@ -1586,13 +1591,13 @@ function doLogin(){
     return;
   }
 
-  api('login',null,{email:email,senha:senha})
+  // Usa GET para evitar problema de redirect do GAS perder o body do POST
+  apiGet('login',null,{email:email,senha:senha})
   .then(function(r){
     if(r.offline||!r){
       entrar(perfil,nome,email);
       mostrarStatus('⚠ Sem conexão — modo offline','aviso');
     } else if(r.ok){
-      // GAS retorna { ok:true, data: { usuario: {...} } }
       var u = (r.data && r.data.usuario) || r.usuario || null;
       if(u){
         entrar(u.perfil,u.nome,u.email||email);
