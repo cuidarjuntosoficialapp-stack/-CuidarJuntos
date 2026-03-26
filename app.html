@@ -3535,8 +3535,7 @@ function iniciarApp(){
   const dot = document.getElementById('notifDot');
   if(dot){
     const temSenhaPadrao = isUsandoSenhaPadrao(U.nome);
-    const gasNaoCfg = !localStorage.getItem('cj_gas_url');
-    dot.style.display = (temSenhaPadrao || gasNaoCfg) ? 'block' : 'none';
+    dot.style.display = temSenhaPadrao ? 'block' : 'none';
   }
 
   // ── Separação de dashboards por perfil ──
@@ -3886,12 +3885,15 @@ function toast(msg){
 // ═══════════════════════════════════════════
 // GAS — INTEGRAÇÃO COM GOOGLE APPS SCRIPT
 // ═══════════════════════════════════════════
+const GAS_URL_PADRAO    = 'https://script.google.com/macros/s/AKfycbz83Jtp7N_tOELrdUIFXytKbJu8Te8x5zdKHQo5-xMP3RiRAQm21NKQLSP58ipSyJbP/exec';
+const GAS_PLANILHA_PADRAO = '11jRCxJvKluR2af9HXDVv4eUXtDrDpI0Ee_dpfY_znl8';
+
 const GAS = {
   getUrl(){
-    return localStorage.getItem('cj_gas_url') || '';
+    return localStorage.getItem('cj_gas_url') || GAS_URL_PADRAO;
   },
   getPacienteId(){
-    return localStorage.getItem('cj_pac_id') || '';
+    return localStorage.getItem('cj_pac_id') || GAS_PLANILHA_PADRAO;
   },
 
   async request(action, params={}){
@@ -4688,10 +4690,6 @@ function abrirAlertas(){
   alertas.push({cor:'var(--blue)',ico:'📅',titulo:'Consulta amanhã — Cardiologista',sub:'Dr. Marcos Carvalho · 14:30 · Clínica CardioVida',acao:"fecharModal('modal-alertas');irPagina('visitas')"});
   alertas.push({cor:'var(--green)',ico:'🔬',titulo:'Hemograma — 26/03/2026',sub:'Laboratório Sabin · 07:30 · Jejum de 8h',acao:"fecharModal('modal-alertas');irPagina('exames')"});
 
-  // Verificar GAS configurado
-  if(!GAS.getUrl()){
-    alertas.push({cor:'var(--red)',ico:'⚙️',titulo:'Sem conexão com a planilha',sub:'Configure a URL do Apps Script nas Configurações.',acao:"fecharModal('modal-alertas');irPagina('config')"});
-  }
 
   if(alertas.length === 0){
     body.innerHTML='<div style="padding:24px;text-align:center;color:var(--t3);font-size:13px;">Nenhuma notificação no momento ✅</div>';
