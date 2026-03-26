@@ -1,5 +1,5 @@
-// CuidarJuntos Service Worker v2
-const CACHE = 'cuidarjuntos-v2';
+// CuidarJuntos Service Worker v3
+const CACHE = 'cuidarjuntos-v3';
 const ASSETS = [
   './app.html',
   './manifest.json',
