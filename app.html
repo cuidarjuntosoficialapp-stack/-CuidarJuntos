@@ -2746,16 +2746,8 @@ window.doDelete=function(){
 
 // init
 document.addEventListener('DOMContentLoaded',function(){
-  // ── AUTO LOGIN — entra direto no dashboard ──
-  curProfile = 'filho';
-  var tbR = document.getElementById('tbRole');
-  var drN = document.getElementById('drname');
-  if(tbR) tbR.textContent = 'FILHO';
-  if(drN) drN.textContent = 'família · filho';
-  applyPerms('filho');
-  testarConexao();
-  pedirPermissaoNotificacao();
-
+  // Sempre inicia na tela de login
+  go('login');
   renderCadMeds();
   updateMedSelect();
   renderUsuarios();
