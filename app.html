@@ -503,6 +503,8 @@ select.inp{cursor:pointer;}
 .ps-btn .ps-desc{font-size:9px;color:var(--t3);display:block;margin-top:1px;}
 .ps-btn.on{border-color:var(--blue);background:var(--blue-lt);}
 .ps-btn.on .ps-lbl{color:var(--blue);}
+.ps-btn.admin-btn.on{border-color:#7B1FA2;background:#F3E5F5;}
+.ps-btn.admin-btn.on .ps-lbl{color:#7B1FA2;}
 
 /* INPUTS LOGIN */
 .lg-lbl{display:block;font-size:10px;font-weight:700;color:var(--t2);
@@ -749,7 +751,7 @@ select.inp{cursor:pointer;}
              text-align:center;">
       <span style="font-size:20px;">📲</span> Salvar na Tela Inicial
     </div>
-    <div onclick="fecharSplash()" style="font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;padding:6px 12px;letter-spacing:.04em;">
+    <div onclick="entrarSemInstalar()" style="font-size:12px;color:rgba(255,255,255,.4);cursor:pointer;padding:6px 12px;letter-spacing:.04em;">
       Entrar sem instalar →
     </div>
   </div>
@@ -867,6 +869,11 @@ select.inp{cursor:pointer;}
         <span class="ps-ico">🏥</span>
         <span class="ps-lbl">Equipe</span>
         <span class="ps-desc">Equipe de Enfermagem</span>
+      </div>
+      <div class="ps-btn admin-btn" id="ps-admin" onclick="selecionarPerfil('admin')">
+        <span class="ps-ico">🛡️</span>
+        <span class="ps-lbl">Admin</span>
+        <span class="ps-desc">Administrador</span>
       </div>
     </div>
 
@@ -2615,7 +2622,8 @@ select.inp{cursor:pointer;}
   ════════════════════════════════════ -->
   <div class="page" id="page-config">
 
-    <!-- 1. CONEXÃO GOOGLE PLANILHA -->
+    <!-- 1. CONEXÃO GOOGLE PLANILHA (só admin) -->
+    <div id="sec-conexao">
     <div class="sec-head"><span class="sec-title">🔗 Conexão com Google Planilha</span></div>
     <div class="card">
       <div class="form-pad">
@@ -2640,6 +2648,8 @@ select.inp{cursor:pointer;}
       </div>
     </div>
 
+    </div><!-- /sec-conexao -->
+
     <!-- 2. MINHA CONTA -->
     <div class="sec-head"><span class="sec-title">👤 Minha conta</span></div>
     <div class="card">
@@ -2655,7 +2665,8 @@ select.inp{cursor:pointer;}
       </div>
     </div>
 
-    <!-- 3. PERMISSÕES POR PERFIL -->
+    <!-- 3. PERMISSÕES POR PERFIL (só admin) -->
+    <div id="sec-permissoes">
     <div class="sec-head"><span class="sec-title">🔐 Controle de acesso por perfil</span></div>
     <div class="card">
       <div style="padding:12px 16px 6px;font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.07em;">Permissões — Filhos</div>
@@ -2673,7 +2684,10 @@ select.inp{cursor:pointer;}
       </div>
     </div>
 
-    <!-- 4. USUÁRIOS -->
+    </div><!-- /sec-permissoes -->
+
+    <!-- 4. USUÁRIOS (só admin) -->
+    <div id="sec-usuarios">
     <div class="sec-head"><span class="sec-title">👥 Usuários cadastrados</span><span class="sec-link" onclick="abrirModal('modal-add-user')">+ Adicionar</span></div>
     <div class="card">
       <div class="card-body-np">
@@ -2719,6 +2733,8 @@ select.inp{cursor:pointer;}
         </div>
       </div>
     </div>
+
+    </div><!-- /sec-usuarios -->
 
     <!-- 5. PREFERÊNCIAS -->
     <div class="sec-head"><span class="sec-title">⚙️ Preferências</span></div>
@@ -3132,13 +3148,13 @@ const USUARIOS = [
   {nome:'Ronaldo',    role:'filho',    ico:'👨‍💼'},
   {nome:'Rubia',      role:'filho',    ico:'👩'},
   {nome:'Enfermagem', role:'cuidador', ico:'🏥'},
+  {nome:'Admin',      role:'admin',    ico:'🛡️'},
 ];
 
 // Senha temporária compartilhada por perfil
-// Família: todos usam a mesma senha inicial → alteram no primeiro acesso
-// Enfermagem: senha separada
 const SENHA_FAMILIA    = 'Familia@2026';
 const SENHA_ENFERMAGEM = 'Enf@2026';
+const SENHA_ADMIN      = 'Admin@2026';
 
 const SENHAS_PADRAO = {
   'Renato':     SENHA_FAMILIA,
@@ -3146,6 +3162,7 @@ const SENHAS_PADRAO = {
   'Ronaldo':    SENHA_FAMILIA,
   'Rubia':      SENHA_FAMILIA,
   'Enfermagem': SENHA_ENFERMAGEM,
+  'Admin':      SENHA_ADMIN,
 };
 
 // Retorna a senha atual (personalizada ou temporária)
@@ -3161,7 +3178,7 @@ function isUsandoSenhaPadrao(nome){
 let U = null;
 let perfilAtual = 'filho';
 
-// ─── Seleção de perfil (Família / Equipe) ───
+// ─── Seleção de perfil (Família / Equipe / Admin) ───
 function selecionarPerfil(p){
   perfilAtual = p;
   document.querySelectorAll('.ps-btn').forEach(b=>b.classList.remove('on'));
@@ -3188,7 +3205,8 @@ function fazerLogin(){
 
   const rolesFamilia=['filho','filha'];
   const rolesEquipe=['cuidador','enfermagem'];
-  const validos=perfilAtual==='filho'?rolesFamilia:rolesEquipe;
+  const rolesAdmin=['admin'];
+  const validos=perfilAtual==='filho'?rolesFamilia:perfilAtual==='admin'?rolesAdmin:rolesEquipe;
 
   const u=USUARIOS.find(u=>u.nome.toLowerCase()===nome&&getSenha(u.nome)===senha&&validos.includes(u.role));
 
@@ -3290,6 +3308,10 @@ function mostrarLogin(){
   ls.classList.remove('oculta');
   ls.style.opacity='1';
   document.getElementById('APP').style.display='none';
+  // Resetar todas as páginas para garantir que volta ao Dashboard no próximo login
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  const home = document.getElementById('page-home');
+  if(home) home.classList.add('on');
 }
 
 // ─── Foto do paciente ───
@@ -3454,13 +3476,24 @@ function iniciarCards(){
 
 function iniciarApp(){
   const isCuidador = U.role==='cuidador';
+  const isAdmin    = U.role==='admin';
 
   // Topbar
-  document.getElementById('tbRole').textContent = isCuidador?'ENFERMAGEM':'FILHO';
+  document.getElementById('tbRole').textContent = isAdmin?'ADMIN':isCuidador?'ENFERMAGEM':'FILHO';
   // Drawer
   document.getElementById('drUserIco').textContent  = U.ico;
   document.getElementById('drUserNome').textContent = U.nome;
-  document.getElementById('drUserRole').textContent = isCuidador?'Equipe de Enfermagem':'Família';
+  document.getElementById('drUserRole').textContent = isAdmin?'Administrador':isCuidador?'Equipe de Enfermagem':'Família';
+
+  // Seção de usuários nas configurações: só para admin
+  const secUsuarios = document.getElementById('sec-usuarios');
+  if(secUsuarios) secUsuarios.style.display = isAdmin ? '' : 'none';
+
+  // Seções de configurações avançadas: só para admin
+  const secConexao = document.getElementById('sec-conexao');
+  if(secConexao) secConexao.style.display = isAdmin ? '' : 'none';
+  const secPermissoes = document.getElementById('sec-permissoes');
+  if(secPermissoes) secPermissoes.style.display = isAdmin ? '' : 'none';
   // Saudação + data dinâmica
   const _agora = new Date();
   const _h = _agora.getHours();
@@ -3515,6 +3548,9 @@ function iniciarApp(){
     const els=['bn-financeiro','dm-financeiro'];
     els.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   }
+
+  // ── Sempre iniciar no Dashboard ──
+  irPagina('home');
 }
 
 // ═══════════════════════════════════════════
@@ -4784,6 +4820,17 @@ function fecharSplash(){
     document.body.style.background='';
   },620);
 }
+function entrarSemInstalar(){
+  // Sempre vai para a tela de login, mesmo que haja sessão salva
+  localStorage.removeItem('cj_user');
+  U = null;
+  document.getElementById('APP').style.display='none';
+  const ls=document.getElementById('loginScreen');
+  ls.classList.remove('oculta');
+  ls.style.opacity='';
+  ls.style.transition='';
+  fecharSplash();
+}
 document.addEventListener('DOMContentLoaded',function(){
   // Nome do paciente
   const nomePac=localStorage.getItem('cj_pacNome')||'';
@@ -4835,8 +4882,11 @@ var _jaInstalado=('standalone' in navigator && navigator.standalone)||
 
 (function(){
   // Registra service worker
+  // Desregistrar service workers antigos para evitar cache desatualizado
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js').catch(function(){});
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){ r.unregister(); });
+    });
   }
 
   if(_jaInstalado) return; // já está instalado — não mostra nada

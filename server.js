@@ -11,7 +11,12 @@ http.createServer((req, res) => {
   let full = path.join(dir, file);
   fs.readFile(full, (err, data) => {
     if (err) { res.writeHead(404); res.end('Not found'); return; }
-    res.writeHead(200, { 'Content-Type': mime[path.extname(full)] || 'text/plain' });
+    res.writeHead(200, {
+      'Content-Type': mime[path.extname(full)] || 'text/plain',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
     res.end(data);
   });
 }).listen(port, '0.0.0.0', () => {
