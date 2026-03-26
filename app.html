@@ -1259,10 +1259,7 @@ function alterarMinhaSenha(){
 
 // ── CONFIGURAÇÃO API (Google Apps Script) ──
 // Tenta carregar URL salva no localStorage
-var GAS_URL = (function(){
-  try { return localStorage.getItem('cuidarbem_gas_url') || 'COLE_SUA_URL_AQUI'; }
-  catch(e){ return 'COLE_SUA_URL_AQUI'; }
-})();
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbzzQwJnyDJXeZJBWehy2JKplwEASiCDBt0RmcdLfoU8nFQ2oo3Q30t1i0cc8yFvCkcg/exec';
 var API_OK = false;
 
 // ── API OTIMIZADA — fila, timeout, retry, feedback visual ──
