@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CuidarJuntos — Admin</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0D47A1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .box{background:#fff;border-radius:24px;width:100%;max-width:380px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+  .header{background:linear-gradient(135deg,#1565C0,#0D47A1);padding:36px 28px;text-align:center;color:#fff;}
+  .header .ico{font-size:48px;margin-bottom:12px;}
+  .header h1{font-size:20px;font-weight:700;margin-bottom:4px;}
+  .header p{font-size:12px;opacity:.8;}
+  .body{padding:28px 24px;}
+  label{font-size:12px;font-weight:600;color:#444;display:block;margin-bottom:6px;}
+  input{width:100%;border:2px solid #E0E0E0;border-radius:12px;padding:14px 16px;font-size:14px;font-family:inherit;outline:none;color:#222;margin-bottom:16px;transition:.2s;}
+  input:focus{border-color:#1565C0;}
+  .btn{width:100%;padding:15px;background:#1565C0;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;}
+  .btn:hover{background:#0D47A1;}
+  .btn:disabled{opacity:.6;cursor:not-allowed;}
+  .erro{display:none;background:#FFEBEE;border:1px solid #FFCDD2;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#C62828;text-align:center;}
+  .footer{text-align:center;padding:16px;font-size:11px;color:#aaa;}
+  .eye{position:relative;}
+  .eye input{padding-right:44px;}
+  .eye-btn{position:absolute;right:14px;top:50%;transform:translateY(-65%);background:none;border:none;cursor:pointer;font-size:18px;color:#aaa;}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <div class="header">
+    <div class="ico">🛡️</div>
+    <h1>Painel Administrativo</h1>
+    <p>CuidarJuntos — Acesso restrito</p>
+  </div>
+  <div class="body">
+    <div class="erro" id="erro">❌ Usuário ou senha incorretos</div>
+
+    <label>Usuário</label>
+    <input id="usuario" type="text" placeholder="Admin" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('senha').focus()"/>
+
+    <label>Senha</label>
+    <div class="eye">
+      <input id="senha" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')entrar()"/>
+      <button class="eye-btn" onclick="toggleSenha()" id="olho">🙈</button>
+    </div>
+
+    <button class="btn" onclick="entrar()" id="btn">Entrar no painel</button>
+  </div>
+  <div class="footer">Acesso exclusivo para administradores</div>
+</div>
+
+<script>
+const ADMIN_USER = 'Admin';
+const ADMIN_SENHA_PADRAO = 'Admin@2026';
+
+function toggleSenha(){
+  const i=document.getElementById('senha');
+  const o=document.getElementById('olho');
+  i.type=i.type==='password'?'text':'password';
+  o.textContent=i.type==='password'?'🙈':'👁️';
+}
+
+function getSenhaAdmin(){
+  return localStorage.getItem('cj_pwd_Admin') || ADMIN_SENHA_PADRAO;
+}
+
+function entrar(){
+  const user  = document.getElementById('usuario').value.trim();
+  const senha = document.getElementById('senha').value.trim();
+  const erro  = document.getElementById('erro');
+  const btn   = document.getElementById('btn');
+
+  if(user.toLowerCase() !== ADMIN_USER.toLowerCase() || senha !== getSenhaAdmin()){
+    erro.style.display='block';
+    document.getElementById('senha').value='';
+    setTimeout(()=>erro.style.display='none', 3000);
+    return;
+  }
+
+  erro.style.display='none';
+  btn.textContent='✅ Entrando...';
+  btn.disabled=true;
+
+  // Salva sessão de admin e redireciona para o app
+  const adminSession = {nome:'Admin', role:'admin', ico:'🛡️'};
+  localStorage.setItem('cj_admin_session', JSON.stringify(adminSession));
+  // Garante que o pac_id padrão está definido para o admin
+  if(!localStorage.getItem('cj_pac_id')){
+    localStorage.setItem('cj_pac_id','11jRCxJvKluR2af9HXDVv4eUXtDrDpI0Ee_dpfY_znl8');
+  }
+
+  setTimeout(()=>{ window.location.href='app.html'; }, 400);
+}
+
+// Foca no campo usuário ao abrir
+window.onload = () => document.getElementById('usuario').focus();
+</script>
+</body>
+</html>

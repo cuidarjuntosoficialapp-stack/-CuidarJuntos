@@ -917,11 +917,7 @@ select.inp{cursor:pointer;}
         <span class="ps-lbl">Equipe</span>
         <span class="ps-desc">Equipe de Enfermagem</span>
       </div>
-      <div class="ps-btn admin-btn" id="ps-admin" onclick="selecionarPerfil('admin')">
-        <span class="ps-ico">🛡️</span>
-        <span class="ps-lbl">Admin</span>
-        <span class="ps-desc">Administrador</span>
-      </div>
+      <!-- Card Admin removido — acesso via /admin.html -->
     </div>
 
     <div class="login-err" id="loginErr">Nome ou senha incorretos.</div>
@@ -5027,6 +5023,22 @@ function entrarSemInstalar(){
   }
 }
 document.addEventListener('DOMContentLoaded',function(){
+  // Detecta sessão de admin vinda do admin.html
+  const adminSession = localStorage.getItem('cj_admin_session');
+  if(adminSession){
+    try {
+      U = JSON.parse(adminSession);
+      localStorage.removeItem('cj_admin_session');
+      // Entra direto no app como admin
+      setTimeout(()=>{
+        fecharSplash();
+        document.getElementById('APP').style.display='flex';
+        document.getElementById('loginScreen').classList.add('oculta');
+        iniciarApp();
+      }, 500);
+    } catch(e) { localStorage.removeItem('cj_admin_session'); }
+  }
+
   // Nome do paciente
   const nomePac=localStorage.getItem('cj_pacNome')||'';
   const el=document.getElementById('spPacNome');
