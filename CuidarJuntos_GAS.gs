@@ -87,6 +87,12 @@ function rotear(e) {
       salvarRegistro:         () => salvarRegistroGenerico(params),
       uploadArquivo:          () => uploadArquivo(params),
       excluirRegistro:        () => excluirRegistro(params),
+
+      // Sistema multi-família
+      gerarFamilia:           () => gerarFamilia(params),
+      ativarCodigo:           () => ativarCodigo(params),
+      listarFamilias:         () => listarFamilias(),
+      desativarFamilia:       () => desativarFamilia(params),
     };
 
     if (rotas[action]) return rotas[action]();
@@ -610,6 +616,105 @@ function obterOuCriarPasta(nome, parentId) {
   return parent.createFolder(nome);
 }
 
+// ============================================================
+// SISTEMA MULTI-FAMÍLIA — Geração e Ativação de Códigos
+// ============================================================
+
+function getRegistroFamilias() {
+  const raw = PropertiesService.getScriptProperties().getProperty('CJ_FAMILIAS') || '[]';
+  try { return JSON.parse(raw); } catch(e) { return []; }
+}
+
+function salvarRegistroFamilias(reg) {
+  PropertiesService.getScriptProperties().setProperty('CJ_FAMILIAS', JSON.stringify(reg));
+}
+
+function gerarCodigoUnico() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let codigo;
+  const reg = getRegistroFamilias();
+  do {
+    let r = '';
+    for(let i = 0; i < 6; i++) r += chars[Math.floor(Math.random() * chars.length)];
+    codigo = 'CJ-' + r.substring(0,3) + '-' + r.substring(3,6);
+  } while(reg.some(f => f.codigo === codigo));
+  return codigo;
+}
+
+function gerarFamilia(p) {
+  if(!p.nomePaciente) return erro('nomePaciente obrigatório');
+
+  const pastaRaiz     = obterOuCriarPasta(CONFIG.PASTA_RAIZ_NOME, null);
+  const nomePasta     = 'Paciente - ' + p.nomePaciente;
+  const pastaPaciente = obterOuCriarPasta(nomePasta, pastaRaiz.getId());
+
+  const subpastas = ['Anexos','Relatorios','Comprovantes','Exames','Receitas_Medicas','Documentos'];
+  subpastas.forEach(sub => obterOuCriarPasta(sub, pastaPaciente.getId()));
+
+  let planilhaId = '';
+  const arquivos = pastaPaciente.getFilesByName('Dados - ' + p.nomePaciente);
+  if(arquivos.hasNext()) {
+    planilhaId = arquivos.next().getId();
+  } else {
+    const ss = SpreadsheetApp.create('Dados - ' + p.nomePaciente);
+    planilhaId = ss.getId();
+    DriveApp.getFileById(planilhaId).moveTo(pastaPaciente);
+    criarAbas(ss, p.nomePaciente, p);
+  }
+
+  // Verifica se já existe código para este paciente
+  const reg = getRegistroFamilias();
+  const existente = reg.find(f => f.planilhaId === planilhaId && f.ativo);
+  if(existente) {
+    return ok({ codigo: existente.codigo, planilhaId, nomePaciente: p.nomePaciente, jaExistia: true });
+  }
+
+  const codigo = gerarCodigoUnico();
+  reg.push({
+    codigo,
+    nomePaciente: p.nomePaciente,
+    nomeFamilia:  p.nomeFamilia || p.nomePaciente,
+    planilhaId,
+    pastaId:      pastaPaciente.getId(),
+    criadoEm:     new Date().toISOString(),
+    ativo:        true
+  });
+  salvarRegistroFamilias(reg);
+
+  return ok({ codigo, planilhaId, nomePaciente: p.nomePaciente, jaExistia: false });
+}
+
+function ativarCodigo(p) {
+  const codigo = (p.codigo || '').trim().toUpperCase().replace(/\s/g,'');
+  if(!codigo) return erro('Código obrigatório');
+
+  const reg    = getRegistroFamilias();
+  const familia = reg.find(f => f.codigo === codigo && f.ativo);
+  if(!familia) return erro('Código inválido ou não encontrado');
+
+  return ok({
+    planilhaId:   familia.planilhaId,
+    nomePaciente: familia.nomePaciente,
+    nomeFamilia:  familia.nomeFamilia,
+    pastaId:      familia.pastaId
+  });
+}
+
+function listarFamilias() {
+  return ok(getRegistroFamilias());
+}
+
+function desativarFamilia(p) {
+  if(!p.codigo) return erro('Código obrigatório');
+  const reg = getRegistroFamilias();
+  const idx = reg.findIndex(f => f.codigo === p.codigo);
+  if(idx === -1) return erro('Família não encontrada');
+  reg[idx].ativo = false;
+  salvarRegistroFamilias(reg);
+  return ok({ desativado: true });
+}
+
+// ============================================================
 function ok(data)  {
   return ContentService
     .createTextOutput(JSON.stringify({ ok: true, data }))

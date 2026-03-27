@@ -786,6 +786,53 @@ select.inp{cursor:pointer;}
 </div>
 
 <!-- ════════════════════════════════════════
+     TELA DE ATIVAÇÃO (primeiro acesso)
+════════════════════════════════════════ -->
+<div class="login-screen oculta" id="telaAtivacao" style="background:#f0f4f8;">
+
+  <div style="background:linear-gradient(135deg,#1565C0 0%,#0D47A1 100%);padding:48px 28px 36px;text-align:center;color:#fff;">
+    <div style="font-size:56px;margin-bottom:14px;">🏠</div>
+    <div style="font-size:22px;font-weight:700;margin-bottom:8px;">Bem-vindo ao CuidarJuntos</div>
+    <div style="font-size:13px;opacity:.85;line-height:1.6;">Para começar, insira o código de acesso<br>que você recebeu</div>
+  </div>
+
+  <div style="padding:28px 24px;flex:1;">
+
+    <div style="background:#E3F2FD;border:1px solid #90CAF9;border-radius:14px;padding:16px;margin-bottom:24px;display:flex;gap:12px;align-items:flex-start;">
+      <div style="font-size:22px;flex-shrink:0;">ℹ️</div>
+      <div style="font-size:12px;color:#1565C0;line-height:1.6;">
+        <strong style="font-size:13px;display:block;margin-bottom:2px;">Como obter seu código?</strong>
+        Após adquirir o app, você recebe um código único para sua família. Digite abaixo para ativar.
+      </div>
+    </div>
+
+    <label style="font-size:12px;font-weight:600;color:#444;display:block;margin-bottom:6px;">Código de acesso</label>
+    <input id="atv-codigo" class="inp" type="text" placeholder="Ex: CJ-ABC-123"
+      style="text-transform:uppercase;letter-spacing:2px;font-size:16px;font-weight:700;"
+      oninput="this.value=this.value.toUpperCase()"/>
+
+    <div id="atv-erro" style="display:none;background:#FFEBEE;border:1px solid #FFCDD2;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#C62828;">
+      ❌ Código inválido. Verifique e tente novamente.
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="ativarCodigo()" id="atv-btn" style="margin-bottom:14px;">
+      ✅ Ativar meu app
+    </button>
+
+    <div style="text-align:center;color:#aaa;font-size:12px;margin:12px 0;position:relative;">
+      <span style="background:#f0f4f8;padding:0 12px;position:relative;">ou</span>
+      <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:#ddd;z-index:0;"></div>
+    </div>
+
+    <button class="btn btn-full" onclick="entrarDemo()"
+      style="background:#fff;border:2px solid #E0E0E0;color:#555;border-radius:14px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">
+      👀 Ver demonstração gratuita
+    </button>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════
      TELA DE LOGIN
 ════════════════════════════════════════ -->
 <div class="login-screen" id="loginScreen">
@@ -2650,6 +2697,43 @@ select.inp{cursor:pointer;}
 
     </div><!-- /sec-conexao -->
 
+    <!-- SEÇÃO: GERENCIAR FAMÍLIAS (só admin) -->
+    <div id="sec-familias">
+      <div class="sec-head"><span class="sec-title">🏠 Gerenciar Famílias</span></div>
+      <div class="card">
+        <div class="card-body" style="padding:16px;">
+
+          <!-- Lista de famílias -->
+          <div id="familias-lista" style="margin-bottom:16px;"></div>
+
+          <!-- Formulário nova família -->
+          <div style="border-top:1px solid var(--border);padding-top:16px;">
+            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:12px;">➕ Criar nova família</div>
+
+            <label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:4px;">Nome do paciente</label>
+            <input id="fam-nomePaciente" class="inp" placeholder="Ex: Maria Silva" style="margin-bottom:10px;"/>
+
+            <label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:4px;">Nome da família (opcional)</label>
+            <input id="fam-nomeFamilia" class="inp" placeholder="Ex: Família Silva" style="margin-bottom:14px;"/>
+
+            <button class="btn btn-primary btn-full" onclick="criarNovaFamilia()" id="fam-btn">
+              🏠 Criar família e gerar código
+            </button>
+          </div>
+
+          <!-- Resultado do código gerado -->
+          <div id="fam-resultado" style="display:none;margin-top:16px;background:#E8F5E9;border:1px solid #A5D6A7;border-radius:12px;padding:16px;">
+            <div style="font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:8px;">✅ Família criada com sucesso!</div>
+            <div style="font-size:12px;color:#333;margin-bottom:6px;">Paciente: <strong id="fam-res-nome"></strong></div>
+            <div style="font-size:12px;color:#333;margin-bottom:12px;">Código de acesso:</div>
+            <div id="fam-res-codigo" style="background:#fff;border:2px dashed #4CAF50;border-radius:10px;padding:14px;text-align:center;font-size:24px;font-weight:800;letter-spacing:4px;color:#1B5E20;cursor:pointer;" onclick="copiarCodigo()"></div>
+            <div style="font-size:11px;color:#555;margin-top:8px;text-align:center;">Toque no código para copiar e enviar pelo WhatsApp</div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /sec-familias -->
+
     <!-- 2. MINHA CONTA -->
     <div class="sec-head"><span class="sec-title">👤 Minha conta</span></div>
     <div class="card">
@@ -3494,6 +3578,8 @@ function iniciarApp(){
   if(secConexao) secConexao.style.display = isAdmin ? '' : 'none';
   const secPermissoes = document.getElementById('sec-permissoes');
   if(secPermissoes) secPermissoes.style.display = isAdmin ? '' : 'none';
+  const secFamilias = document.getElementById('sec-familias');
+  if(secFamilias) secFamilias.style.display = isAdmin ? '' : 'none';
   // Saudação + data dinâmica
   const _agora = new Date();
   const _h = _agora.getHours();
@@ -3593,6 +3679,8 @@ function irPagina(id){
   window.scrollTo(0,0);
   // Carregar chat ao abrir a página
   if(id==='chat') chatRenderizar();
+  // Carregar lista de famílias ao abrir configurações (admin)
+  if(id==='config' && U && U.role==='admin') carregarListaFamilias();
 }
 
 // ═══════════════════════════════════════════
@@ -3967,6 +4055,109 @@ async function testarConexao(){
     GAS.setStatus(false,'Sem resposta — verifique a URL');
     toast('⚠️ Não foi possível conectar');
   }
+}
+
+// ═══════════════════════════════════════════
+// SISTEMA MULTI-FAMÍLIA
+// ═══════════════════════════════════════════
+
+// Verifica se já foi ativado — se não, mostra tela de ativação
+function verificarAtivacao(){
+  const pac = localStorage.getItem('cj_pac_id');
+  if(!pac){
+    document.getElementById('telaAtivacao').classList.remove('oculta');
+    document.getElementById('loginScreen').classList.add('oculta');
+  }
+}
+
+// Ativa o app com o código fornecido pela família
+async function ativarCodigo(){
+  const codigo = document.getElementById('atv-codigo').value.trim().toUpperCase();
+  const erroEl = document.getElementById('atv-erro');
+  const btn    = document.getElementById('atv-btn');
+
+  if(!codigo){ erroEl.style.display='block'; return; }
+  erroEl.style.display='none';
+  btn.textContent='⏳ Verificando...';
+  btn.disabled=true;
+
+  try {
+    const r = await GAS.request('ativarCodigo',{codigo});
+    if(r && r.ok && r.data && r.data.planilhaId){
+      localStorage.setItem('cj_pac_id', r.data.planilhaId);
+      if(r.data.nomePaciente) localStorage.setItem('cj_pacNome', r.data.nomePaciente);
+      toast('✅ App ativado! Bem-vindo, '+r.data.nomeFamilia+'!');
+      // Esconde ativação, mostra login
+      document.getElementById('telaAtivacao').classList.add('oculta');
+      document.getElementById('loginScreen').classList.remove('oculta');
+    } else {
+      erroEl.style.display='block';
+      btn.textContent='✅ Ativar meu app';
+      btn.disabled=false;
+    }
+  } catch(e) {
+    erroEl.style.display='block';
+    btn.textContent='✅ Ativar meu app';
+    btn.disabled=false;
+  }
+}
+
+// Admin: cria nova família e gera código
+async function criarNovaFamilia(){
+  const nomePaciente = document.getElementById('fam-nomePaciente').value.trim();
+  const nomeFamilia  = document.getElementById('fam-nomeFamilia').value.trim();
+  if(!nomePaciente){ toast('⚠️ Informe o nome do paciente'); return; }
+
+  const btn = document.getElementById('fam-btn');
+  btn.textContent='⏳ Criando...';
+  btn.disabled=true;
+
+  const r = await GAS.request('gerarFamilia',{nomePaciente, nomeFamilia: nomeFamilia||nomePaciente});
+  btn.textContent='🏠 Criar família e gerar código';
+  btn.disabled=false;
+
+  if(r && r.ok && r.data){
+    document.getElementById('fam-res-nome').textContent = nomePaciente;
+    document.getElementById('fam-res-codigo').textContent = r.data.codigo;
+    document.getElementById('fam-resultado').style.display='block';
+    document.getElementById('fam-nomePaciente').value='';
+    document.getElementById('fam-nomeFamilia').value='';
+    carregarListaFamilias();
+    toast('✅ Família criada com sucesso!');
+  } else {
+    toast('⚠️ Erro ao criar família: '+(r?.erro||'tente novamente'));
+  }
+}
+
+// Copia o código gerado para a área de transferência
+function copiarCodigo(){
+  const cod = document.getElementById('fam-res-codigo').textContent;
+  navigator.clipboard.writeText(cod).then(()=>toast('✅ Código copiado!'));
+}
+
+// Carrega e exibe a lista de famílias no painel Admin
+async function carregarListaFamilias(){
+  const el = document.getElementById('familias-lista');
+  if(!el) return;
+  el.innerHTML='<div style="font-size:12px;color:var(--t3);padding:8px 0;">Carregando...</div>';
+
+  const r = await GAS.request('listarFamilias',{});
+  if(!r || !r.ok || !r.data || r.data.length===0){
+    el.innerHTML='<div style="font-size:12px;color:var(--t3);padding:8px 0;">Nenhuma família cadastrada ainda.</div>';
+    return;
+  }
+
+  el.innerHTML = r.data.filter(f=>f.ativo).map(f=>`
+    <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+      <div style="font-size:22px;">🏠</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--t1);">${f.nomePaciente}</div>
+        <div style="font-size:11px;color:var(--t3);">Família: ${f.nomeFamilia}</div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:2px;color:#1565C0;margin-top:2px;" onclick="navigator.clipboard.writeText('${f.codigo}').then(()=>toast('✅ Código copiado!'))" style="cursor:pointer;">${f.codigo}</div>
+      </div>
+      <div style="font-size:10px;background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 8px;font-weight:700;">ATIVO</div>
+    </div>
+  `).join('');
 }
 
 // ═══════════════════════════════════════════
@@ -4823,11 +5014,17 @@ function entrarSemInstalar(){
   localStorage.removeItem('cj_user');
   U = null;
   document.getElementById('APP').style.display='none';
-  const ls=document.getElementById('loginScreen');
-  ls.classList.remove('oculta');
-  ls.style.opacity='';
-  ls.style.transition='';
   fecharSplash();
+  // Se não tem código ativado, vai para tela de ativação primeiro
+  if(!localStorage.getItem('cj_pac_id')){
+    document.getElementById('telaAtivacao').classList.remove('oculta');
+    document.getElementById('loginScreen').classList.add('oculta');
+  } else {
+    const ls=document.getElementById('loginScreen');
+    ls.classList.remove('oculta');
+    ls.style.opacity='';
+    ls.style.transition='';
+  }
 }
 document.addEventListener('DOMContentLoaded',function(){
   // Nome do paciente
