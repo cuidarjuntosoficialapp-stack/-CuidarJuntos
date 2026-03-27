@@ -3326,10 +3326,14 @@ var DEMO_DADOS = {
 function entrarDemo(){
   _modoDemo = true;
   U = DEMO_USER;
+  // Oculta qualquer tela visível (ativação ou login)
   const ls = document.getElementById('loginScreen');
-  ls.style.opacity='0';ls.style.transition='opacity .3s';
+  const atv = document.getElementById('telaAtivacao');
+  if(ls){ ls.style.opacity='0'; ls.style.transition='opacity .3s'; }
+  if(atv){ atv.style.opacity='0'; atv.style.transition='opacity .3s'; }
   setTimeout(()=>{
-    ls.classList.add('oculta');
+    if(ls) ls.classList.add('oculta');
+    if(atv){ atv.classList.add('oculta'); atv.style.opacity=''; atv.style.transition=''; }
     document.getElementById('APP').style.display='flex';
     document.getElementById('bannerDemo').style.display='flex';
     iniciarApp();
