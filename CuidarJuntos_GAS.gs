@@ -271,17 +271,41 @@ function listarUsuariosApp(p) {
 }
 
 function cadastrarUsuarioApp(p) {
-  const planilhaId = getPlanilhaId(p);
-  if (!planilhaId) return erro('planilhaId não configurado');
   const dados = p.dados || {};
-  if (!dados.Email && !dados.email) return erro('Email obrigatório');
   if (!dados.Senha && !dados['Senha Hash']) return erro('Senha obrigatória');
+
+  // Se vier código de família, busca a planilha correta
+  const codigoFamilia = dados.CodigoFamilia || dados.codigoFamilia || '';
+  let planilhaId = '';
+
+  if (codigoFamilia) {
+    const familias = getRegistroFamilias();
+    const familia  = familias.find(f => f.codigo === codigoFamilia && f.ativo);
+    if (!familia) return erro('Código de família inválido: ' + codigoFamilia);
+    planilhaId = familia.planilhaId;
+  } else {
+    planilhaId = getPlanilhaId(p);
+    if (!planilhaId) return erro('planilhaId ou codigoFamilia obrigatório');
+  }
+
   const ss  = SpreadsheetApp.openById(planilhaId);
-  const aba = ss.getSheetByName('Usuarios_e_Permissoes');
-  const email = dados.Email || dados.email || '';
-  const senha = dados.Senha || dados['Senha Hash'] || '';
-  const nome  = dados.Nome  || email.split('@')[0];
+  let aba = ss.getSheetByName('Usuarios_e_Permissoes');
+
+  // Cria a aba automaticamente se não existir
+  if (!aba) {
+    aba = ss.insertSheet('Usuarios_e_Permissoes');
+    const colunas = ['ID','Nome','Role','Senha','Email','Ativo','CriadoEm'];
+    aba.getRange(1, 1, 1, colunas.length).setValues([colunas]);
+    aba.getRange(1, 1, 1, colunas.length)
+      .setBackground('#6A1B9A').setFontColor('#FFFFFF').setFontWeight('bold');
+    aba.setFrozenRows(1);
+  }
+
+  const email  = dados.Email  || dados.email  || '';
+  const senha  = dados.Senha  || dados['Senha Hash'] || '';
+  const nome   = dados.Nome   || dados.nome   || email.split('@')[0];
   const perfil = dados.Perfil || dados.perfil || 'filho';
+
   aba.appendRow([Utilities.getUuid(), nome, perfil, senha, email, true, new Date()]);
   return ok({ criado: true });
 }
@@ -673,6 +697,7 @@ function gerarFamilia(p) {
   reg.push({
     codigo,
     nomePaciente: p.nomePaciente,
+    cpf:          p.cpf || '',
     nomeFamilia:  p.nomeFamilia || p.nomePaciente,
     planilhaId,
     pastaId:      pastaPaciente.getId(),

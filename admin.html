@@ -86,10 +86,8 @@ function entrar(){
   // Salva sessão de admin e redireciona para o app
   const adminSession = {nome:'Admin', role:'admin', ico:'🛡️'};
   localStorage.setItem('cj_admin_session', JSON.stringify(adminSession));
-  // Garante que o pac_id padrão está definido para o admin
-  if(!localStorage.getItem('cj_pac_id')){
-    localStorage.setItem('cj_pac_id','11jRCxJvKluR2af9HXDVv4eUXtDrDpI0Ee_dpfY_znl8');
-  }
+  // Admin não precisa de cj_pac_id — marca flag para pular splash
+  localStorage.setItem('cj_admin_skip_splash','1');
 
   setTimeout(()=>{ window.location.href='app.html'; }, 400);
 }

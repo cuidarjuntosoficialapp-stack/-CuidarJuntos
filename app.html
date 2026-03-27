@@ -216,6 +216,9 @@ body{display:flex;justify-content:center;}
 .inp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 textarea.inp{resize:vertical;min-height:80px;}
 select.inp{cursor:pointer;}
+.inp-senha-wrap{position:relative;display:flex;align-items:center;}
+.inp-senha-wrap .inp{padding-right:44px;}
+.inp-senha-wrap .olho-btn{position:absolute;right:12px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--t3);padding:0;line-height:1;}
 .form-pad{padding:16px;}
 
 /* Lista rows */
@@ -2695,39 +2698,11 @@ select.inp{cursor:pointer;}
 
     <!-- SEÇÃO: GERENCIAR FAMÍLIAS (só admin) -->
     <div id="sec-familias">
-      <div class="sec-head"><span class="sec-title">🏠 Gerenciar Famílias</span></div>
-      <div class="card">
-        <div class="card-body" style="padding:16px;">
+      <div class="sec-head"><span class="sec-title">🏠 Pacientes / Famílias</span><span class="sec-link" onclick="abrirModal('modal-nova-familia')">+ Novo paciente</span></div>
 
-          <!-- Lista de famílias -->
-          <div id="familias-lista" style="margin-bottom:16px;"></div>
+      <!-- Cards de pacientes -->
+      <div id="familias-lista"></div>
 
-          <!-- Formulário nova família -->
-          <div style="border-top:1px solid var(--border);padding-top:16px;">
-            <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:12px;">➕ Criar nova família</div>
-
-            <label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:4px;">Nome do paciente</label>
-            <input id="fam-nomePaciente" class="inp" placeholder="Ex: Maria Silva" style="margin-bottom:10px;"/>
-
-            <label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:4px;">Nome da família (opcional)</label>
-            <input id="fam-nomeFamilia" class="inp" placeholder="Ex: Família Silva" style="margin-bottom:14px;"/>
-
-            <button class="btn btn-primary btn-full" onclick="criarNovaFamilia()" id="fam-btn">
-              🏠 Criar família e gerar código
-            </button>
-          </div>
-
-          <!-- Resultado do código gerado -->
-          <div id="fam-resultado" style="display:none;margin-top:16px;background:#E8F5E9;border:1px solid #A5D6A7;border-radius:12px;padding:16px;">
-            <div style="font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:8px;">✅ Família criada com sucesso!</div>
-            <div style="font-size:12px;color:#333;margin-bottom:6px;">Paciente: <strong id="fam-res-nome"></strong></div>
-            <div style="font-size:12px;color:#333;margin-bottom:12px;">Código de acesso:</div>
-            <div id="fam-res-codigo" style="background:#fff;border:2px dashed #4CAF50;border-radius:10px;padding:14px;text-align:center;font-size:24px;font-weight:800;letter-spacing:4px;color:#1B5E20;cursor:pointer;" onclick="copiarCodigo()"></div>
-            <div style="font-size:11px;color:#555;margin-top:8px;text-align:center;">Toque no código para copiar e enviar pelo WhatsApp</div>
-          </div>
-
-        </div>
-      </div>
     </div><!-- /sec-familias -->
 
     <!-- 2. MINHA CONTA -->
@@ -2746,71 +2721,14 @@ select.inp{cursor:pointer;}
     </div>
 
     <!-- 3. PERMISSÕES POR PERFIL (só admin) -->
-    <div id="sec-permissoes">
-    <div class="sec-head"><span class="sec-title">🔐 Controle de acesso por perfil</span></div>
-    <div class="card">
-      <div style="padding:12px 16px 6px;font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.07em;">Permissões — Filhos</div>
-      <div class="card-body-np">
-        <div class="cfg-item"><div class="cfg-item-left"><div class="cfg-ico" style="background:var(--blue-lt);">💰</div><div><div class="cfg-lbl">Ver financeiro</div><div class="cfg-sub">Despesas e contribuições</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="cfg-item"><div class="cfg-item-left"><div class="cfg-ico" style="background:var(--purple-lt);">📊</div><div><div class="cfg-lbl">Ver relatórios</div><div class="cfg-sub">Resumo mensal</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="cfg-item"><div class="cfg-item-left"><div class="cfg-ico" style="background:var(--green-lt);">❤️</div><div><div class="cfg-lbl">Ver resumo de saúde</div><div class="cfg-sub">Vitais e alertas</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      </div>
-      <div style="padding:12px 16px 6px;font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.07em;border-top:1px solid var(--border);">Permissões — Equipe de Enfermagem</div>
-      <div class="card-body-np">
-        <div class="cfg-item"><div class="cfg-item-left"><div class="cfg-ico" style="background:var(--green-lt);">🏥</div><div><div class="cfg-lbl">Saúde completa</div><div class="cfg-sub">Todos os módulos clínicos</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="cfg-item"><div class="cfg-item-left"><div class="cfg-ico" style="background:var(--red-lt);">❤️</div><div><div class="cfg-lbl">Registrar sinais vitais</div><div class="cfg-sub">Pressão, FC, temperatura...</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="cfg-item"><div class="cfg-item-left"><div class="cfg-ico" style="background:var(--amber-lt);">💊</div><div><div class="cfg-lbl">Administrar medicamentos</div><div class="cfg-sub">Registrar administrações</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-        <div class="cfg-item"><div class="cfg-item-left"><div class="cfg-ico" style="background:var(--blue-lt);">💰</div><div><div class="cfg-lbl">Ver financeiro</div><div class="cfg-sub">Bloqueado para esta equipe</div></div></div><div class="toggle" onclick="toast('Financeiro sempre bloqueado para equipe')"></div></div>
-      </div>
-    </div>
-
-    </div><!-- /sec-permissoes -->
+    <div id="sec-permissoes" style="display:none;"></div><!-- sec-permissoes movido para dentro do cadastro de usuário -->
 
     <!-- 4. USUÁRIOS (só admin) -->
     <div id="sec-usuarios">
     <div class="sec-head"><span class="sec-title">👥 Usuários cadastrados</span><span class="sec-link" onclick="abrirModal('modal-add-user')">+ Adicionar</span></div>
     <div class="card">
-      <div class="card-body-np">
-        <div class="list-item">
-          <div class="li-ico blue">👨</div>
-          <div class="li-body"><div class="li-title">Renato</div><div class="li-sub">renato@cuidarjuntos.com · Filho</div></div>
-          <div class="li-end">
-            <div class="toggle on" onclick="this.classList.toggle('on')" style="margin-bottom:4px;"></div>
-            <div style="display:flex;gap:4px;"><button class="btn btn-outline btn-sm">✏️</button><button class="btn btn-red btn-sm">🗑️</button></div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="li-ico blue">👦</div>
-          <div class="li-body"><div class="li-title">Rene</div><div class="li-sub">rene@cuidarjuntos.com · Filho</div></div>
-          <div class="li-end">
-            <div class="toggle on" onclick="this.classList.toggle('on')" style="margin-bottom:4px;"></div>
-            <div style="display:flex;gap:4px;"><button class="btn btn-outline btn-sm">✏️</button><button class="btn btn-red btn-sm">🗑️</button></div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="li-ico blue">👨‍💼</div>
-          <div class="li-body"><div class="li-title">Ronaldo</div><div class="li-sub">ronaldo@cuidarjuntos.com · Filho</div></div>
-          <div class="li-end">
-            <div class="toggle on" onclick="this.classList.toggle('on')" style="margin-bottom:4px;"></div>
-            <div style="display:flex;gap:4px;"><button class="btn btn-outline btn-sm">✏️</button><button class="btn btn-red btn-sm">🗑️</button></div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="li-ico blue">👩</div>
-          <div class="li-body"><div class="li-title">Rubia</div><div class="li-sub">rubia@cuidarjuntos.com · Filha</div></div>
-          <div class="li-end">
-            <div class="toggle on" onclick="this.classList.toggle('on')" style="margin-bottom:4px;"></div>
-            <div style="display:flex;gap:4px;"><button class="btn btn-outline btn-sm">✏️</button><button class="btn btn-red btn-sm">🗑️</button></div>
-          </div>
-        </div>
-        <div class="list-item">
-          <div class="li-ico green">🏥</div>
-          <div class="li-body"><div class="li-title">Equipe de Enfermagem</div><div class="li-sub">Acesso clínico · Equipe</div></div>
-          <div class="li-end">
-            <div class="toggle on" onclick="this.classList.toggle('on')" style="margin-bottom:4px;"></div>
-            <div style="display:flex;gap:4px;"><button class="btn btn-outline btn-sm">✏️</button><button class="btn btn-red btn-sm">🗑️</button></div>
-          </div>
-        </div>
+      <div class="card-body-np" id="usuarios-lista">
+        <div style="padding:20px;text-align:center;color:var(--t3);font-size:13px;">Carregando usuários...</div>
       </div>
     </div>
 
@@ -3099,19 +3017,76 @@ select.inp{cursor:pointer;}
   </div>
 </div>
 
+<!-- Modal: Novo paciente -->
+<div class="modal-ov" id="modal-nova-familia">
+  <div class="modal">
+    <div class="modal-hd"><span class="modal-title">🏠 Novo paciente</span><button class="modal-close" onclick="fecharModal('modal-nova-familia')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="lbl">Nome do paciente</label><input class="inp" id="fam-nomePaciente" placeholder="Ex: Maria Silva"/></div>
+      <div class="form-group"><label class="lbl">CPF do paciente</label><input class="inp" id="fam-cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)"/></div>
+      <div class="form-group"><label class="lbl">Nome da família (opcional)</label><input class="inp" id="fam-nomeFamilia" placeholder="Ex: Família Silva"/></div>
+      <div id="fam-resultado" style="display:none;background:#E8F5E9;border:1px solid #A5D6A7;border-radius:12px;padding:16px;margin-top:8px;">
+        <div style="font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:8px;">✅ Paciente criado!</div>
+        <div style="font-size:12px;color:#333;margin-bottom:6px;">Paciente: <strong id="fam-res-nome"></strong></div>
+        <div style="font-size:12px;color:#333;margin-bottom:8px;">Código de acesso:</div>
+        <div id="fam-res-codigo" style="background:#fff;border:2px dashed #4CAF50;border-radius:10px;padding:12px;text-align:center;font-size:22px;font-weight:800;letter-spacing:4px;color:#1B5E20;cursor:pointer;" onclick="copiarCodigo()"></div>
+        <div style="font-size:11px;color:#555;margin-top:6px;text-align:center;">Toque no código para copiar</div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary btn-full" id="fam-btn" onclick="criarNovaFamilia()">🏠 Criar e gerar código</button></div>
+  </div>
+</div>
+
+<!-- Modal: Detalhe do paciente (usuários vinculados) -->
+<div class="modal-ov" id="modal-paciente-detalhe">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title" id="mpd-titulo">Paciente</span>
+      <button class="modal-close" onclick="fecharModal('modal-paciente-detalhe')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#E3F2FD;border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">🔑</span>
+        <div>
+          <div style="font-size:10px;color:#1565C0;font-weight:700;text-transform:uppercase;">Código de acesso</div>
+          <div id="mpd-codigo" style="font-size:18px;font-weight:800;letter-spacing:3px;color:#0D47A1;cursor:pointer;" onclick="navigator.clipboard.writeText(this.textContent).then(()=>toast('✅ Código copiado!'))"></div>
+        </div>
+      </div>
+
+      <!-- Família -->
+      <div style="font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">👨‍👩‍👧 Família</div>
+      <div id="mpd-familia-lista" style="margin-bottom:12px;min-height:32px;"></div>
+      <button class="btn btn-outline btn-sm btn-full" style="margin-bottom:16px;" onclick="abrirCadastroUsuarioPaciente('filho')">+ Adicionar familiar</button>
+
+      <!-- Enfermagem -->
+      <div style="font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">🏥 Equipe de Enfermagem</div>
+      <div id="mpd-enf-lista" style="margin-bottom:12px;min-height:32px;"></div>
+      <button class="btn btn-outline btn-sm btn-full" onclick="abrirCadastroUsuarioPaciente('cuidador')">+ Adicionar enfermeiro(a)</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Adicionar usuário -->
 <div class="modal-ov" id="modal-add-user">
   <div class="modal">
     <div class="modal-hd"><span class="modal-title">👤 Novo usuário</span><button class="modal-close" onclick="fecharModal('modal-add-user')">✕</button></div>
     <div class="modal-body">
-      <div class="form-group"><label class="lbl">Nome completo</label><input class="inp" placeholder="Nome do usuário"/></div>
-      <div class="form-group"><label class="lbl">E-mail</label><input class="inp" type="email" placeholder="email@cuidarjuntos.com"/></div>
+      <div class="form-group"><label class="lbl">Nome completo</label><input class="inp" id="nu-nome" placeholder="Nome do usuário"/></div>
+      <div class="form-group"><label class="lbl">E-mail</label><input class="inp" id="nu-email" type="email" placeholder="email@exemplo.com"/></div>
       <div class="form-group"><label class="lbl">Perfil</label>
-        <select class="inp"><option value="filho">Filho / Família</option><option value="cuidador">Equipe de Enfermagem</option></select>
+        <select class="inp" id="nu-perfil" onchange="atualizarPermissoesModal()"><option value="filho">Filho / Família</option><option value="cuidador">Equipe de Enfermagem</option></select>
       </div>
-      <div class="form-group"><label class="lbl">Senha inicial</label><input class="inp" type="password" placeholder="Mínimo 6 caracteres"/></div>
+      <div class="form-group"><label class="lbl">Família / Paciente</label>
+        <select class="inp" id="nu-familia"><option value="">Carregando famílias...</option></select>
+      </div>
+      <div class="form-group"><label class="lbl">Senha inicial</label><div class="inp-senha-wrap"><input class="inp" id="nu-senha" type="password" placeholder="Mínimo 6 caracteres"/><button type="button" class="olho-btn" onclick="toggleSenhaInput('nu-senha',this)">👁️</button></div></div>
+      <!-- Permissões por módulo -->
+      <div style="background:#F5F5F5;border-radius:10px;padding:12px;margin-top:4px;">
+        <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;">🔐 Permissões de acesso</div>
+        <div id="nu-perm-lista"></div>
+      </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-primary btn-full" onclick="fecharModal('modal-add-user');toast('Usuário cadastrado!')">Cadastrar</button></div>
+    <div class="modal-footer"><button class="btn btn-primary btn-full" onclick="salvarNovoUsuario()">Cadastrar</button></div>
   </div>
 </div>
 
@@ -3163,7 +3138,7 @@ select.inp{cursor:pointer;}
     <div class="modal-body">
       <div class="form-group"><label class="lbl">E-mail atual</label><input class="inp" type="email" value="renato@cuidarjuntos.com" readonly style="opacity:.6"/></div>
       <div class="form-group"><label class="lbl">Novo e-mail</label><input class="inp" type="email" placeholder="novo@email.com"/></div>
-      <div class="form-group"><label class="lbl">Confirmar senha</label><input class="inp" type="password" placeholder="••••••"/></div>
+      <div class="form-group"><label class="lbl">Confirmar senha</label><div class="inp-senha-wrap"><input class="inp" id="emailSenhaConfirm" type="password" placeholder="••••••"/><button type="button" class="olho-btn" onclick="toggleSenhaInput('emailSenhaConfirm',this)">👁️</button></div></div>
     </div>
     <div class="modal-footer"><button class="btn btn-primary btn-full" onclick="fecharModal('modal-email');toast('E-mail atualizado!')">Salvar</button></div>
   </div>
@@ -3206,9 +3181,9 @@ select.inp{cursor:pointer;}
     <div class="modal-hd"><span class="modal-title">🔑 Alterar senha</span><button class="modal-close" onclick="fecharModal('modal-senha')">✕</button></div>
     <div class="modal-body">
       <div id="senhaAviso" style="display:none;background:var(--amber-lt);border:1px solid var(--amber-mid);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--amber);margin-bottom:14px;">⚠️ Você está usando a senha temporária. Informe-a no campo abaixo e escolha uma senha pessoal.<br><span id="senhaAvisoTexto" style="font-weight:700;"></span></div>
-      <div class="form-group"><label class="lbl">Senha atual</label><input class="inp" id="senhaAtual" type="password" placeholder="••••••"/></div>
-      <div class="form-group"><label class="lbl">Nova senha <span style="font-weight:400;text-transform:none;font-size:9px;color:var(--t3);">mínimo 6 caracteres</span></label><input class="inp" id="senhaNova" type="password" placeholder="••••••"/></div>
-      <div class="form-group"><label class="lbl">Confirmar nova senha</label><input class="inp" id="senhaConfirma" type="password" placeholder="••••••"/></div>
+      <div class="form-group"><label class="lbl">Senha atual</label><div class="inp-senha-wrap"><input class="inp" id="senhaAtual" type="password" placeholder="••••••"/><button type="button" class="olho-btn" onclick="toggleSenhaInput('senhaAtual',this)">👁️</button></div></div>
+      <div class="form-group"><label class="lbl">Nova senha <span style="font-weight:400;text-transform:none;font-size:9px;color:var(--t3);">mínimo 6 caracteres</span></label><div class="inp-senha-wrap"><input class="inp" id="senhaNova" type="password" placeholder="••••••"/><button type="button" class="olho-btn" onclick="toggleSenhaInput('senhaNova',this)">👁️</button></div></div>
+      <div class="form-group"><label class="lbl">Confirmar nova senha</label><div class="inp-senha-wrap"><input class="inp" id="senhaConfirma" type="password" placeholder="••••••"/><button type="button" class="olho-btn" onclick="toggleSenhaInput('senhaConfirma',this)">👁️</button></div></div>
       <div id="senhaErro" style="display:none;background:var(--red-lt);border:1px solid var(--red-mid);border-radius:8px;padding:10px;font-size:12px;color:var(--red);text-align:center;"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-primary btn-full" onclick="alterarSenha()">Salvar nova senha</button></div>
@@ -3275,6 +3250,12 @@ function toggleSenha(){
   const o=document.getElementById('olhoIco');
   i.type=i.type==='password'?'text':'password';
   o.textContent=i.type==='password'?'🙈':'👁️';
+}
+function toggleSenhaInput(inputId, btn){
+  const i=document.getElementById(inputId);
+  if(!i) return;
+  i.type=i.type==='password'?'text':'password';
+  btn.textContent=i.type==='password'?'👁️':'🙈';
 }
 
 // ─── Login ───
@@ -3676,7 +3657,10 @@ function irPagina(id){
   // Carregar chat ao abrir a página
   if(id==='chat') chatRenderizar();
   // Carregar lista de famílias ao abrir configurações (admin)
-  if(id==='config' && U && U.role==='admin') carregarListaFamilias();
+  if(id==='config' && U && U.role==='admin'){
+    carregarListaFamilias();
+    carregarListaUsuarios();
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -3716,6 +3700,7 @@ function aba(pagina, id){
 // ═══════════════════════════════════════════
 function abrirModal(id){
   document.getElementById(id).classList.add('on');
+  if(id==='modal-add-user'){ popularSelectFamilias(); atualizarPermissoesModal(); }
 }
 function fecharModal(id){
   document.getElementById(id).classList.remove('on');
@@ -3969,8 +3954,10 @@ function toast(msg){
 // ═══════════════════════════════════════════
 // GAS — INTEGRAÇÃO COM GOOGLE APPS SCRIPT
 // ═══════════════════════════════════════════
-const GAS_URL_PADRAO    = 'https://script.google.com/macros/s/AKfycbxfELooIsC0_41WLDiAYD6VLVTVglMG5ZxKglCd_5aC4ARNNdpKW5hVot7fXuCU2pWV/exec';
-const GAS_PLANILHA_PADRAO = '11jRCxJvKluR2af9HXDVv4eUXtDrDpI0Ee_dpfY_znl8';
+const GAS_URL_PADRAO    = 'https://script.google.com/macros/s/AKfycbwzRi8vBeXF7vySPrwzqFQX6ZMSSc6Iq9RAuXrXtZQXZA4WigafRNO7i8Ae3tUZBVPH/exec';
+// Atualiza automaticamente se estiver com URL antiga
+(function(){ const salva = localStorage.getItem('cj_gas_url'); if(salva && salva !== GAS_URL_PADRAO) { localStorage.setItem('cj_gas_url', GAS_URL_PADRAO); } })();
+const GAS_PLANILHA_PADRAO = ''; // Sem padrão — cada cliente ativa com seu código
 
 const GAS = {
   getUrl(){
@@ -4072,7 +4059,7 @@ async function ativarCodigo(){
   const erroEl = document.getElementById('atv-erro');
   const btn    = document.getElementById('atv-btn');
 
-  if(!codigo){ erroEl.style.display='block'; return; }
+  if(!codigo){ erroEl.style.display='block'; erroEl.textContent='❌ Informe o código de acesso.'; return; }
   erroEl.style.display='none';
   btn.textContent='⏳ Verificando...';
   btn.disabled=true;
@@ -4080,18 +4067,35 @@ async function ativarCodigo(){
   try {
     const r = await GAS.request('ativarCodigo',{codigo});
     if(r && r.ok && r.data && r.data.planilhaId){
-      localStorage.setItem('cj_pac_id', r.data.planilhaId);
-      if(r.data.nomePaciente) localStorage.setItem('cj_pacNome', r.data.nomePaciente);
-      toast('✅ App ativado! Bem-vindo, '+r.data.nomeFamilia+'!');
-      // Esconde ativação, mostra login
-      document.getElementById('telaAtivacao').classList.add('oculta');
-      document.getElementById('loginScreen').classList.remove('oculta');
+      // Salva planilhaId e dados do paciente
+      localStorage.setItem('cj_pac_id',    r.data.planilhaId);
+      localStorage.setItem('cj_pacNome',   r.data.nomePaciente || '');
+      localStorage.setItem('cj_famNome',   r.data.nomeFamilia  || '');
+      localStorage.setItem('cj_pac_codigo', codigo);
+
+      // Mostra confirmação antes de ir para o login
+      btn.textContent='✅ Ativado!';
+      btn.style.background='#2E7D32';
+
+      const pacNomeEl = document.getElementById('spPacNome');
+      if(pacNomeEl) pacNomeEl.textContent = 'Cuidando de '+(r.data.nomePaciente||'');
+
+      setTimeout(()=>{
+        document.getElementById('telaAtivacao').classList.add('oculta');
+        document.getElementById('loginScreen').classList.remove('oculta');
+        toast('✅ App ativado! Cuidando de '+r.data.nomePaciente);
+        btn.textContent='✅ Ativar meu app';
+        btn.style.background='';
+        btn.disabled=false;
+      }, 800);
     } else {
+      erroEl.textContent='❌ Código inválido. Verifique e tente novamente.';
       erroEl.style.display='block';
       btn.textContent='✅ Ativar meu app';
       btn.disabled=false;
     }
   } catch(e) {
+    erroEl.textContent='❌ Erro de conexão. Verifique sua internet.';
     erroEl.style.display='block';
     btn.textContent='✅ Ativar meu app';
     btn.disabled=false;
@@ -4099,16 +4103,26 @@ async function ativarCodigo(){
 }
 
 // Admin: cria nova família e gera código
+function mascaraCPF(el){
+  let v = el.value.replace(/\D/g,'').substring(0,11);
+  if(v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');
+  else if(v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');
+  else if(v.length > 3) v = v.replace(/(\d{3})(\d{0,3})/,'$1.$2');
+  el.value = v;
+}
+
 async function criarNovaFamilia(){
   const nomePaciente = document.getElementById('fam-nomePaciente').value.trim();
+  const cpf          = document.getElementById('fam-cpf').value.trim();
   const nomeFamilia  = document.getElementById('fam-nomeFamilia').value.trim();
   if(!nomePaciente){ toast('⚠️ Informe o nome do paciente'); return; }
+  if(!cpf){ toast('⚠️ Informe o CPF do paciente'); return; }
 
   const btn = document.getElementById('fam-btn');
   btn.textContent='⏳ Criando...';
   btn.disabled=true;
 
-  const r = await GAS.request('gerarFamilia',{nomePaciente, nomeFamilia: nomeFamilia||nomePaciente});
+  const r = await GAS.request('gerarFamilia',{nomePaciente, cpf, nomeFamilia: nomeFamilia||nomePaciente});
   btn.textContent='🏠 Criar família e gerar código';
   btn.disabled=false;
 
@@ -4117,6 +4131,7 @@ async function criarNovaFamilia(){
     document.getElementById('fam-res-codigo').textContent = r.data.codigo;
     document.getElementById('fam-resultado').style.display='block';
     document.getElementById('fam-nomePaciente').value='';
+    document.getElementById('fam-cpf').value='';
     document.getElementById('fam-nomeFamilia').value='';
     carregarListaFamilias();
     toast('✅ Família criada com sucesso!');
@@ -4135,25 +4150,246 @@ function copiarCodigo(){
 async function carregarListaFamilias(){
   const el = document.getElementById('familias-lista');
   if(!el) return;
-  el.innerHTML='<div style="font-size:12px;color:var(--t3);padding:8px 0;">Carregando...</div>';
+  el.innerHTML='<div style="padding:16px;text-align:center;color:var(--t3);font-size:13px;">Carregando...</div>';
 
   const r = await GAS.request('listarFamilias',{});
-  if(!r || !r.ok || !r.data || r.data.length===0){
-    el.innerHTML='<div style="font-size:12px;color:var(--t3);padding:8px 0;">Nenhuma família cadastrada ainda.</div>';
+  if(!r || !r.ok || !r.data || r.data.filter(f=>f.ativo).length===0){
+    el.innerHTML='<div style="padding:16px;font-size:13px;color:var(--t3);">Nenhum paciente cadastrado ainda.</div>';
     return;
   }
 
   el.innerHTML = r.data.filter(f=>f.ativo).map(f=>`
-    <div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
-      <div style="font-size:22px;">🏠</div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:700;color:var(--t1);">${f.nomePaciente}</div>
-        <div style="font-size:11px;color:var(--t3);">Família: ${f.nomeFamilia}</div>
-        <div style="font-size:12px;font-weight:700;letter-spacing:2px;color:#1565C0;margin-top:2px;" onclick="navigator.clipboard.writeText('${f.codigo}').then(()=>toast('✅ Código copiado!'))" style="cursor:pointer;">${f.codigo}</div>
+    <div onclick="abrirDetalhesPaciente('${f.codigo}','${escHTML(f.nomePaciente)}','${escHTML(f.nomeFamilia||f.nomePaciente)}')"
+      style="border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;background:#fff;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;">
+      <div style="width:44px;height:44px;border-radius:12px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🧓</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:700;color:var(--t1);">${escHTML(f.nomePaciente)}</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px;">${escHTML(f.nomeFamilia||f.nomePaciente)}</div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:2px;color:#1565C0;margin-top:4px;">${f.codigo}</div>
       </div>
-      <div style="font-size:10px;background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:3px 8px;font-weight:700;">ATIVO</div>
+      <div style="font-size:18px;color:var(--t3);">›</div>
     </div>
   `).join('');
+}
+
+let _pacienteAtivo = null;
+
+async function abrirDetalhesPaciente(codigo, nomePaciente, nomeFamilia){
+  _pacienteAtivo = { codigo, nomePaciente, nomeFamilia };
+
+  document.getElementById('mpd-titulo').textContent = '🧓 '+nomePaciente;
+  document.getElementById('mpd-codigo').textContent = codigo;
+
+  document.getElementById('mpd-familia-lista').innerHTML = '<div style="font-size:12px;color:var(--t3);">Carregando...</div>';
+  document.getElementById('mpd-enf-lista').innerHTML     = '<div style="font-size:12px;color:var(--t3);">Carregando...</div>';
+
+  abrirModal('modal-paciente-detalhe');
+
+  // Busca planilhaId pelo código
+  const rf = await GAS.request('listarFamilias',{});
+  if(!rf || !rf.ok) return;
+  const familia = rf.data.find(f=>f.codigo===codigo);
+  if(!familia){ document.getElementById('mpd-familia-lista').innerHTML='<div style="font-size:12px;color:var(--t3);">Planilha não encontrada.</div>'; return; }
+
+  _pacienteAtivo.planilhaId = familia.planilhaId;
+
+  const ru = await GAS.request('listarUsuarios',{ planilhaId: familia.planilhaId });
+  const usuarios = (ru && ru.ok && ru.data) ? ru.data : [];
+
+  const familia_users = usuarios.filter(u=>['filho','filha'].includes((u.perfil||'').toLowerCase()));
+  const enf_users     = usuarios.filter(u=>['cuidador','enfermagem'].includes((u.perfil||'').toLowerCase()));
+
+  renderUsuariosPaciente('mpd-familia-lista', familia_users);
+  renderUsuariosPaciente('mpd-enf-lista', enf_users);
+}
+
+function renderUsuariosPaciente(elId, lista){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  if(!lista || lista.length===0){
+    el.innerHTML='<div style="font-size:12px;color:var(--t3);padding:4px 0;">Nenhum usuário cadastrado.</div>';
+    return;
+  }
+  el.innerHTML = lista.map(u=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="width:32px;height:32px;border-radius:8px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;font-size:16px;">👤</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:var(--t1);">${escHTML(u.nome||'')}</div>
+        <div style="font-size:11px;color:var(--t3);">${escHTML(u.email||'')}</div>
+      </div>
+      <button onclick="desativarUsuarioPaciente('${u.id}')" style="background:none;border:none;color:#EF5350;font-size:16px;cursor:pointer;">🗑️</button>
+    </div>`).join('');
+}
+
+function abrirCadastroUsuarioPaciente(perfil){
+  fecharModal('modal-paciente-detalhe');
+  // Pré-seleciona família e perfil
+  setTimeout(()=>{
+    abrirModal('modal-add-user');
+    const selF = document.getElementById('nu-familia');
+    const selP = document.getElementById('nu-perfil');
+    if(_pacienteAtivo && selF){
+      // Seleciona a opção correta
+      for(let i=0;i<selF.options.length;i++){
+        if(selF.options[i].value===_pacienteAtivo.codigo){ selF.selectedIndex=i; break; }
+      }
+    }
+    if(selP) selP.value = perfil;
+    atualizarPermissoesModal();
+  }, 200);
+}
+
+async function desativarUsuarioPaciente(id){
+  if(!_pacienteAtivo || !_pacienteAtivo.planilhaId) return;
+  if(!confirm('Remover este usuário?')) return;
+  const r = await GAS.request('desativarUsuario',{ id, planilhaId: _pacienteAtivo.planilhaId });
+  if(r && r.ok){
+    toast('✅ Usuário removido');
+    abrirDetalhesPaciente(_pacienteAtivo.codigo, _pacienteAtivo.nomePaciente, _pacienteAtivo.nomeFamilia);
+  } else {
+    toast('❌ Erro ao remover');
+  }
+}
+
+// ═══════════════════════════════════════════
+// USUÁRIOS — cadastrar / listar / desativar
+// ═══════════════════════════════════════════
+async function carregarListaUsuarios(){
+  const el = document.getElementById('usuarios-lista');
+  if(!el) return;
+  el.innerHTML='<div style="padding:20px;text-align:center;color:var(--t3);font-size:13px;">Carregando usuários...</div>';
+
+  const r = await GAS.request('listarUsuarios',{});
+  if(!r || !r.ok || !r.data || r.data.length===0){
+    el.innerHTML='<div style="padding:16px;font-size:13px;color:var(--t3);">Nenhum usuário cadastrado ainda.</div>';
+    return;
+  }
+
+  const icoMap = {filho:'👨',filha:'👩',cuidador:'🏥',enfermagem:'🏥',admin:'🛡️'};
+  const corMap = {filho:'blue',filha:'blue',cuidador:'green',enfermagem:'green',admin:'purple'};
+  const labelMap = {filho:'Família',filha:'Família',cuidador:'Enfermagem',enfermagem:'Enfermagem',admin:'Admin'};
+
+  el.innerHTML = r.data.map(u=>{
+    const ico = icoMap[u.perfil]||'👤';
+    const cor = corMap[u.perfil]||'blue';
+    const label = labelMap[u.perfil]||u.perfil;
+    const ativo = u.ativo !== false && u.ativo !== 'false';
+    return `
+    <div class="list-item">
+      <div class="li-ico ${cor}">${ico}</div>
+      <div class="li-body">
+        <div class="li-title">${escHTML(u.nome||'')}</div>
+        <div class="li-sub">${escHTML(u.email||'')} · ${label}</div>
+      </div>
+      <div class="li-end">
+        <div class="toggle ${ativo?'on':''}" style="margin-bottom:4px;" onclick="toggleUsuario('${u.id}',this)"></div>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-red btn-sm" onclick="desativarUsuario('${u.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+const MODULOS_PERMISSAO = [
+  { id:'saude',      ico:'❤️',  label:'Saúde / Sinais vitais',    filho:true,  cuidador:true  },
+  { id:'medicamentos',ico:'💊', label:'Medicamentos',              filho:true,  cuidador:true  },
+  { id:'agenda',     ico:'📅',  label:'Agenda / Consultas',        filho:true,  cuidador:true  },
+  { id:'financeiro', ico:'💰',  label:'Financeiro',                filho:true,  cuidador:false, bloqueado_cuidador:true },
+  { id:'documentos', ico:'📁',  label:'Documentos',                filho:true,  cuidador:true  },
+  { id:'chat',       ico:'💬',  label:'Chat familiar',             filho:true,  cuidador:true  },
+];
+
+function atualizarPermissoesModal(){
+  const perfil = document.getElementById('nu-perfil').value;
+  const lista  = document.getElementById('nu-perm-lista');
+  if(!lista) return;
+
+  lista.innerHTML = MODULOS_PERMISSAO.map(m=>{
+    const padrao  = perfil==='filho' ? m.filho : m.cuidador;
+    const bloq    = perfil==='cuidador' && m.bloqueado_cuidador;
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #E0E0E0;">
+      <span style="font-size:16px;">${m.ico}</span>
+      <span style="flex:1;font-size:13px;color:var(--t1);">${m.label}</span>
+      ${bloq
+        ? `<span style="font-size:11px;color:#EF5350;font-weight:700;">Bloqueado</span>`
+        : `<div class="toggle ${padrao?'on':''}" id="perm-${m.id}" onclick="this.classList.toggle('on')" style="flex-shrink:0;"></div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function getPermissoesAtivas(){
+  const perms = {};
+  MODULOS_PERMISSAO.forEach(m=>{
+    const el = document.getElementById('perm-'+m.id);
+    perms[m.id] = el ? el.classList.contains('on') : false;
+  });
+  return perms;
+}
+
+async function popularSelectFamilias(){
+  const sel = document.getElementById('nu-familia');
+  if(!sel) return;
+  const r = await GAS.request('listarFamilias',{});
+  if(r && r.ok && r.data && r.data.length > 0){
+    const ativas = r.data.filter(f=>f.ativo);
+    sel.innerHTML = ativas.map(f=>`<option value="${f.codigo}">${f.nomePaciente} (${f.codigo})</option>`).join('');
+  } else {
+    sel.innerHTML = '<option value="">Nenhuma família cadastrada</option>';
+  }
+}
+
+async function salvarNovoUsuario(){
+  const nome    = document.getElementById('nu-nome').value.trim();
+  const email   = document.getElementById('nu-email').value.trim();
+  const perfil  = document.getElementById('nu-perfil').value;
+  const familia = document.getElementById('nu-familia').value;
+  const senha   = document.getElementById('nu-senha').value;
+
+  if(!nome){ toast('⚠️ Informe o nome'); return; }
+  if(!familia){ toast('⚠️ Selecione a família'); return; }
+  if(!senha || senha.length < 6){ toast('⚠️ Senha deve ter no mínimo 6 caracteres'); return; }
+
+  const btn = document.querySelector('#modal-add-user .btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Cadastrando...';
+
+  const permissoes = getPermissoesAtivas();
+  const r = await GAS.request('cadastrarUsuario', { dados: { Nome: nome, Email: email, Perfil: perfil, Senha: senha, CodigoFamilia: familia, Permissoes: JSON.stringify(permissoes) } });
+
+  btn.disabled = false;
+  btn.textContent = 'Cadastrar';
+
+  if(r && r.ok){
+    fecharModal('modal-add-user');
+    ['nu-nome','nu-email','nu-senha'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    toast('✅ Usuário cadastrado com sucesso!');
+    // Reabre o detalhe do paciente para mostrar o usuário na lista
+    if(_pacienteAtivo){
+      setTimeout(()=>abrirDetalhesPaciente(_pacienteAtivo.codigo, _pacienteAtivo.nomePaciente, _pacienteAtivo.nomeFamilia), 300);
+    }
+  } else {
+    toast('❌ Erro: '+(r&&r.erro?r.erro:'Falha ao cadastrar'));
+  }
+}
+
+async function desativarUsuario(id){
+  if(!confirm('Deseja remover este usuário?')) return;
+  const r = await GAS.request('desativarUsuario', { id });
+  if(r && r.ok){
+    toast('✅ Usuário removido');
+    carregarListaUsuarios();
+  } else {
+    toast('❌ Erro ao remover usuário');
+  }
+}
+
+async function toggleUsuario(id, el){
+  el.classList.toggle('on');
+  const ativo = el.classList.contains('on');
+  await GAS.request('editarUsuario', { id, dados: { Ativo: ativo } });
 }
 
 // ═══════════════════════════════════════════
@@ -5003,8 +5239,37 @@ function fecharSplash(){
     sp.classList.add('oculto');
     document.documentElement.style.background='';
     document.body.style.background='';
+    // Se é sessão de admin, não mexe nas telas (DOMContentLoaded cuida disso)
+    const isAdmin = !!localStorage.getItem('cj_admin_skip_splash');
+    if(isAdmin){ localStorage.removeItem('cj_admin_skip_splash'); return; }
+
+    // Decide qual tela mostrar
+    const temCodigo = !!localStorage.getItem('cj_pac_id');
+    const telaAtv   = document.getElementById('telaAtivacao');
+    const telaLogin = document.getElementById('loginScreen');
+    if(!temCodigo){
+      telaAtv.classList.remove('oculta');
+      telaLogin.classList.add('oculta');
+    } else {
+      telaAtv.classList.add('oculta');
+      telaLogin.classList.remove('oculta');
+    }
   },620);
 }
+function trocarFamilia(){
+  if(!confirm('Deseja trocar de família? Você precisará inserir um novo código de acesso.')) return;
+  localStorage.removeItem('cj_pac_id');
+  localStorage.removeItem('cj_pacNome');
+  localStorage.removeItem('cj_famNome');
+  localStorage.removeItem('cj_pac_codigo');
+  const atv = document.getElementById('telaAtivacao');
+  const lg  = document.getElementById('loginScreen');
+  const codigo = document.getElementById('atv-codigo');
+  if(codigo) codigo.value = '';
+  atv.classList.remove('oculta');
+  lg.classList.add('oculta');
+}
+
 function entrarSemInstalar(){
   // Sempre vai para a tela de login, mesmo que haja sessão salva
   localStorage.removeItem('cj_user');
